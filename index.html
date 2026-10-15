@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kacamata Senior Assessor - V2</title>
+    <style>
+        :root {
+            --bg-color: #FAF7F2;
+            --card-bg: #FFFFFF;
+            --text-main: #2D2A26;
+            --text-muted: #6B635B;
+            --accent-terracotta: #B5654A;
+            --accent-sage: #8A9A85;
+            --border-color: #EAE3D9;
+            --error-red: #D9534F;
+            --success-green: #5CB85C;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 80px;
+            padding-top: 60px;
+        }
+        .top-bar { position: fixed; top: 0; left: 0; right: 0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 12px 20px; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .top-title { font-size: 14px; font-weight: 700; color: var(--text-main); }
+        .menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); }
+        .progress-container { position: fixed; top: 53px; left: 0; right: 0; height: 4px; background: var(--border-color); z-index: 99; }
+        .progress-fill { height: 100%; background: var(--accent-terracotta); width: 0%; transition: width 0.3s ease; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-top: 1px solid var(--border-color); padding: 12px 20px; z-index: 100; display: flex; justify-content: space-between; gap: 12px; }
+        .nav-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .btn-prev { background: var(--border-color); color: var(--text-main); }
+        .btn-next { background: var(--text-main); color: #fff; }
+        .nav-btn:hover { transform: translateY(-2px); }
+        .container { max-width: 640px; margin: 0 auto; padding: 24px 20px; }
+        .view-section { display: none; animation: fadeIn 0.4s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chapter-header { text-align: center; margin-bottom: 32px; }
+        .chapter-label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-terracotta); font-weight: 700; margin-bottom: 8px; }
+        .chapter-title { font-size: 28px; font-weight: 800; line-height: 1.2; color: var(--text-main); margin-bottom: 24px; }
+        .hero-img { width: 100%; border-radius: 16px; box-shadow: 0 8px 24px rgba(45, 42, 38, 0.08); margin-bottom: 24px; object-fit: cover; display: block; aspect-ratio: 16/9; }
+        h2 { font-size: 20px; font-weight: 700; margin: 32px 0 16px; color: var(--text-main); }
+        p { font-size: 16px; margin-bottom: 16px; color: var(--text-main); }
+        .highlight { background-color: rgba(181, 101, 74, 0.1); color: var(--accent-terracotta); padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .italic-muted { font-style: italic; color: var(--text-muted); }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(45, 42, 38, 0.04); border: 1px solid var(--border-color); }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .card-text { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; }
+        .card-insight { font-size: 14px; font-weight: 600; color: var(--accent-terracotta); background: rgba(181, 101, 74, 0.05); padding: 10px; border-radius: 8px; border-left: 3px solid var(--accent-terracotta); }
+        .battle-card { background: var(--card-bg); border-radius: 20px; padding: 28px 24px; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(45, 42, 38, 0.06); border: 1px solid var(--border-color); position: relative; overflow: hidden; }
+        .battle-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; }
+        .card-terracotta::before { background: var(--accent-terracotta); }
+        .card-sage::before { background: var(--accent-sage); }
+        .bc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .bc-icon { font-size: 24px; background: #FDFBF9; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid var(--border-color); }
+        .bc-title { font-size: 18px; font-weight: 800; color: var(--text-main); }
+        .bc-subtitle { font-size: 12px; color: var(--text-muted); }
+        .bc-section { margin-bottom: 16px; }
+        .bc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .label-terracotta { color: var(--accent-terracotta); }
+        .label-sage { color: var(--accent-sage); }
+        .script-box { background: #FDFBF9; border-left: 3px solid var(--accent-sage); padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 14px; font-style: italic; color: var(--text-main); margin-top: 8px; }
+        .accordion-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; overflow: hidden; transition: all 0.3s ease; }
+        .accordion-header { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; color: var(--text-main); user-select: none; }
+        .accordion-header:hover { background-color: #FDFBF9; }
+        .accordion-icon { font-size: 20px; transition: transform 0.3s ease; color: var(--accent-sage); }
+        .accordion-item.active .accordion-icon { transform: rotate(180deg); }
+        .accordion-item.active { border-color: var(--accent-sage); box-shadow: 0 4px 12px rgba(138, 154, 133, 0.15); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; padding: 0 20px; background-color: #FDFBF9; }
+        .accordion-item.active .accordion-content { max-height: 500px; padding: 0 20px 20px; }
+        .accordion-content p { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; }
+        .reflection-box { background: #F0F4EF; border: 1px solid var(--accent-sage); border-radius: 12px; padding: 24px; margin-top: 40px; }
+        .reflection-title { font-size: 18px; font-weight: 700; color: var(--accent-sage); margin-bottom: 16px; }
+        .radio-group { display: flex; flex-direction: column; gap: 10px; }
+        .radio-label { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; transition: all 0.2s ease; font-size: 14px; }
+        .radio-label:hover { border-color: var(--accent-sage); }
+        .radio-label input[type="radio"] { accent-color: var(--accent-sage); width: 18px; height: 18px; }
+        .radio-label.selected { border-color: var(--accent-sage); background: #E8EFE7; font-weight: 600; }
+        .feedback-msg { margin-top: 16px; padding: 12px; background: var(--card-bg); border-radius: 8px; font-size: 14px; color: var(--text-main); display: none; animation: fadeIn 0.3s ease; }
+        .simulator-box { background: #FFF8F5; border: 2px solid var(--accent-terracotta); border-radius: 16px; padding: 24px; margin-top: 40px; }
+        .simulator-title { font-size: 18px; font-weight: 700; color: var(--accent-terracotta); margin-bottom: 16px; }
+        .hr-question { background: var(--card-bg); padding: 16px; border-radius: 12px; font-weight: 600; margin-bottom: 20px; border-left: 4px solid var(--accent-terracotta); font-size: 15px; }
+        .option-btn { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; cursor: pointer; font-size: 14px; color: var(--text-main); transition: all 0.2s ease; font-family: inherit; }
+        .option-btn:hover:not(:disabled) { border-color: var(--accent-terracotta); background: #FFF8F5; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
+        .option-btn.correct { border-color: var(--success-green); background: #E8F5E9; color: #2E7D32; font-weight: 600; }
+        .option-btn.wrong { border-color: var(--error-red); background: #FFEBEE; color: #C62828; text-decoration: line-through; opacity: 0.6; }
+        .simulator-feedback { margin-top: 16px; padding: 16px; border-radius: 10px; font-size: 14px; display: none; animation: fadeIn 0.3s ease; }
+        .simulator-feedback.show-correct { background: #E8F5E9; color: #2E7D32; border: 1px solid var(--success-green); }
+        .simulator-feedback.show-wrong { background: #FFEBEE; color: #C62828; border: 1px solid var(--error-red); }
+        .worksheet-section { background: var(--card-bg); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(45, 42, 38, 0.04); border: 1px solid var(--border-color); }
+        .input-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+        .form-hint { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 12px; font-style: italic; }
+        .form-input, .form-textarea { width: 100%; padding: 14px 16px; border: 1px solid var(--border-color); border-radius: 10px; font-family: inherit; font-size: 15px; color: var(--text-main); background: #FDFBF9; transition: all 0.2s ease; resize: vertical; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--accent-sage); background: #fff; box-shadow: 0 0 0 3px rgba(138, 154, 133, 0.15); }
+        .form-textarea { min-height: 80px; }
+        .btn-action { display: block; width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; margin-bottom: 12px; font-family: inherit; }
+        .btn-primary { background: var(--accent-terracotta); color: #fff; }
+        .btn-primary:hover { background: #9E533B; }
+        .btn-secondary { background: #F0F4EF; color: var(--accent-sage); }
+        .btn-secondary:hover { background: #E8EFE7; }
+        .preview-card { display: none; background: #FFF8F5; border: 2px dashed var(--accent-terracotta); border-radius: 12px; padding: 20px; margin-top: 20px; animation: fadeIn 0.4s ease; }
+        .preview-title { font-size: 14px; font-weight: 700; color: var(--accent-terracotta); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .preview-text { font-size: 16px; line-height: 1.8; color: var(--text-main); }
+        .copy-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; padding: 10px 16px; background: var(--accent-sage); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
+        .copy-btn:hover { background: #758570; }
+        .copy-btn.copied { background: var(--text-main); }
+        .cover-container { text-align: center; padding: 20px 0; }
+        .cover-img { width: 100%; border-radius: 20px; box-shadow: 0 12px 32px rgba(45, 42, 38, 0.12); margin-bottom: 32px; object-fit: cover; display: block; aspect-ratio: 3/4; }
+        .cover-title { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 16px; color: var(--text-main); }
+        .cover-subtitle { font-size: 16px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.5; }
+        .btn-start { background: var(--accent-terracotta); color: #fff; padding: 16px 40px; border-radius: 30px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s; }
+        .btn-start:hover { transform: scale(1.05); }
+        .closing-message { text-align: center; padding: 40px 24px; background: linear-gradient(135deg, rgba(181, 101, 74, 0.08), rgba(138, 154, 133, 0.08)); border-radius: 20px; margin-bottom: 32px; border: 1px solid var(--border-color); }
+        .closing-emoji { font-size: 56px; margin-bottom: 16px; }
+        .summary-item { display: flex; gap: 16px; padding: 16px; background: #FDFBF9; border-radius: 12px; margin-bottom: 12px; border-left: 3px solid var(--accent-sage); }
+        .summary-number { font-size: 20px; font-weight: 800; color: var(--accent-sage); min-width: 32px; }
+        .summary-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .summary-content p { font-size: 13px; color: var(--text-muted); margin: 0; }
+        .toc-list { list-style: none; padding: 0; margin: 0; }
+        .toc-item { display: flex; align-items: center; padding: 14px 12px; border-bottom: 1px solid var(--border-color); text-decoration: none; color: var(--text-main); transition: all 0.2s ease; border-radius: 8px; cursor: pointer; }
+        .toc-item:hover { background: #FDFBF9; padding-left: 16px; }
+        .toc-item:last-child { border-bottom: none; }
+        .toc-chapter { font-weight: 700; color: var(--accent-terracotta); margin-right: 12px; font-size: 13px; min-width: 50px; }
+        .toc-title { flex: 1; font-size: 15px; font-weight: 500; }
+        .toc-item.current { background: rgba(138, 154, 133, 0.1); border: 1px solid var(--accent-sage); }
+        .disclaimer-text { font-size: 13px; color: var(--text-muted); line-height: 1.8; }
+        .disclaimer-text strong { color: var(--text-main); }
+        .toc-modal { position: fixed; inset: 0; background: rgba(45, 42, 38, 0.6); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .toc-modal.active { display: flex; animation: fadeIn 0.2s ease; }
+        .toc-content { background: var(--card-bg); width: 100%; max-width: 400px; border-radius: 20px; padding: 24px; max-height: 80vh; overflow-y: auto; }
+        .toc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .toc-header h3 { font-size: 18px; font-weight: 800; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
+        .copyright-page { text-align: center; padding: 40px 20px; }
+        .copyright-logo { font-size: 48px; margin-bottom: 24px; }
+        .copyright-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; color: var(--text-main); }
+        .copyright-year { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
+        .copyright-divider { width: 60px; height: 2px; background: var(--accent-terracotta); margin: 24px auto; }
+        .copyright-text { font-size: 14px; color: var(--text-muted); line-height: 1.8; max-width: 480px; margin: 0 auto 16px; }
+        .copyright-text strong { color: var(--text-main); }
+        .copyright-warning { background: rgba(181, 101, 74, 0.08); border-left: 3px solid var(--accent-terracotta); padding: 16px; border-radius: 8px; text-align: left; margin: 24px auto; max-width: 480px; font-size: 13px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="top-title">Kacamata Senior Assessor</div>
+        <button class="menu-btn" onclick="openTOC()">☰</button>
+    </div>
+    <div class="progress-container"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <div class="container">
+
+        <!-- VIEW 0: COVER -->
+        <div id="view-0" class="view-section active">
+            <div class="cover-container">
+                <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80" alt="Cover" class="cover-img">
+                <h1 class="cover-title">Jawabanmu Sudah Benar,<br>Tapi HR Tetap Ragu</h1>
+                <p class="cover-subtitle">Kerangka yang bikin jawabanmu tidak diabaikan di interview.<br><strong>Untuk Fresh Graduate yang ingin diperhatikan.</strong></p>
+                <button class="btn-start" onclick="showView(1)">Mulai Baca →</button>
+            </div>
+        </div>
+
+        <!-- VIEW 1: HAK CIPTA -->
+        <div id="view-1" class="view-section">
+            <div class="copyright-page">
+                <div class="copyright-logo"></div>
+                <div class="copyright-title">Kacamata Senior Assessor</div>
+                <div class="copyright-year">Copyright © 2026</div>
+                <div class="copyright-divider"></div>
+                <p class="copyright-text">Ebook ini disusun berdasarkan observasi praktis terhadap proses interview HR di perusahaan menengah dan startup.</p>
+                <div class="copyright-warning">
+                    <strong>⚠️ Dilarang memperbanyak</strong> sebagian atau seluruh isi ebook ini tanpa izin tertulis dari pemilik hak cipta.
+                </div>
+                <button class="btn-start" style="margin-top: 32px;" onclick="showView(2)">Lanjut ke Daftar Isi →</button>
+            </div>
+        </div>
+
+        <!-- VIEW 2: TOC -->
+        <div id="view-2" class="view-section">
+            <header class="chapter-header">
+                <div class="chapter-label">Daftar Isi</div>
+                <h1 class="chapter-title">Peta Perjalananmu</h1>
+                <img src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=800&q=80" alt="Peta" class="hero-img" style="aspect-ratio: 4/3;">
+            </header>
+            <div class="card card-terracotta">
+                <div class="bc-header">
+                    <div class="bc-icon">📑</div>
+                    <div><div class="bc-title">Daftar Isi Lengkap</div><div class="bc-subtitle">Klik bab untuk langsung melompat</div></div>
+                </div>
+                <ul class="toc-list">
+                    <div class="toc-item" onclick="showView(3)"><span class="toc-chapter">Bab 1</span><span class="toc-title">Jebakan "Jawaban Sempurna"</span><span>→</span></div>
+                    <div class="toc-item" onclick="showView(4)"><span class="toc-chapter">Bab 2</span><span class="toc-title">Pergeseran Paradigma & Kerangka 3 Bagian</span><span>→</span></div>
+                    <div class="toc-item" onclick="showView(5)"><span class="toc-chapter">Bab 3</span><span class="toc-title">Ujian Sebenarnya: Follow-up yang Menekan</span><span>→</span></div>
+                    <div class="toc-item" onclick="showView(6)"><span class="toc-chapter">Bab 4</span><span class="toc-title">Zona Praktik: Racik Jawabanmu</span><span>→</span></div>
+                    <div class="toc-item" onclick="showView(7)"><span class="toc-chapter">Bab 5</span><span class="toc-title">Cheat Sheet & Battle Cards</span><span>→</span></div>
+                    <div class="toc-item" onclick="showView(8)"><span class="toc-chapter">Bab 6</span><span class="toc-title">Penutup & Ringkasan Perjalanan</span><span>→</span></div>
+                </ul>
+            </div>
+            <button class="btn-start" style="width: 100%; margin-top: 24px;" onclick="showView(3)">Mulai Bab 1 →</button>
+        </div>
+
+        <!-- VIEW 3: BAB 1 -->
+        <div id="view-3" class="view-section">
+            <header class="chapter-header">
+                <div class="chapter-label">Bab 1</div>
+                <h1 class="chapter-title">Jebakan "Jawaban Sempurna"</h1>
+                <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80" alt="Interview" class="hero-img">
+            </header>
+            <section>
+                <p>Kamu mungkin sudah pernah interview lebih dari sekali. Tapi yang sering terjadi setelah itu adalah... <strong>diam. Tidak ada kabar.</strong></p>
+                <p>Yang akan kita bedah di sini adalah satu hal yang sering membuat HR tetap ragu: <span class="highlight">jawaban yang terlalu rapi dan sulit dibedakan.</span></p>
+            </section>
+            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80" alt="Robot" class="hero-img" style="margin-top: 32px; aspect-ratio: 4/3;">
+            <section>
+                <h2>3 Tanda Jawabanmu "Terlalu Rapi"</h2>
+                <div class="card">
+                    <div class="card-title"> Terlalu Mulus dari Awal sampai Akhir</div>
+                    <div class="card-text">Tidak ada jeda, tidak ada koreksi kecil, semua poin tersusun sempurna seperti robot.</div>
+                    <div class="card-insight"> Catatan HR: "Ini sudah dihafal atau benar-benar dialami?"</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">📉 Berubah Saat Ditanya Lebih Dalam</div>
+                    <div class="card-text">Jawaban pertama tenang, tapi saat di-follow-up jadi defensif.</div>
+                    <div class="card-insight">💭 Catatan HR: "Kurang stabil."</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">️ Cerita Terasa Umum</div>
+                    <div class="card-text">Banyak kata seperti "tim kami", "saya selalu", tanpa detail unik.</div>
+                    <div class="card-insight">💭 Catatan HR: "Mirip kandidat lain."</div>
+                </div>
+            </section>
+            <section class="reflection-box">
+                <div class="reflection-title"> Cek Ombak: Refleksi Bab 1</div>
+                <p style="font-size: 15px; margin-bottom: 16px;">Sejauh mana kamu merasa terjebak di "Jawaban Sempurna"?</p>
+                <div class="radio-group">
+                    <label class="radio-label"><input type="radio" name="v3_reflection" value="1"> Saya sering menghafal skrip.</label>
+                    <label class="radio-label"><input type="radio" name="v3_reflection" value="2"> Saya panik saat di-follow-up.</label>
+                    <label class="radio-label"><input type="radio" name="v3_reflection" value="3"> Jawaban saya terlalu umum.</label>
+                </div>
+                <div id="v3_feedback" class="feedback-msg"></div>
+            </section>
+        </div>
+
+        <!-- VIEW 4: BAB 2 -->
+        <div id="view-4" class="view-section">
+            <header class="chapter-header">
+                <div class="chapter-label">Bab 2</div>
+                <h1 class="chapter-title">Pergeseran Paradigma & Kerangka 3 Bagian</h1>
+                <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80" alt="Blueprint" class="hero-img">
+            </header>
+            <section>
+                <p>HRD menilai <span class="highlight">bagaimana kamu merangkainya</span>. Mereka mencari 3 hal ini: Struktur, Nilai, dan Penyampaian.</p>
+                <p class="italic-muted" style="text-align: center; margin: 24px 0;"> Klik setiap pilar di bawah ini 👇</p>
+            </section>
+            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="Tim" class="hero-img" style="margin-top: 32px; aspect-ratio: 4/3;">
+            <section>
+                <div class="accordion-item v4_accordion">
+                    <div class="accordion-header"><span>🏗️ Pilar 1: Struktur (The Structure)</span><span class="accordion-icon">▼</span></div>
+                    <div class="accordion-content">
+                        <p>Gunakan alur ini agar tidak bertele-tele:</p>
+                        <ul style="padding-left: 20px; color: var(--text-muted); font-size: 14px;">
+                            <li><strong>Konteks:</strong> Situasi spesifik (1 kalimat)</li>
+                            <li><strong>Tindakan:</strong> Apa yang <em>spesifik</em> kamu lakukan (2-3 kalimat)</li>
+                            <li><strong>Hasil:</strong> Dampak positifnya (1 kalimat)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="accordion-item v4_accordion">
+                    <div class="accordion-header"><span>💡 Pilar 2: Nilai (The Soul)</span><span class="accordion-icon">▼</span></div>
+                    <div class="accordion-content">
+                        <p>Tambahkan insight pribadi:</p>
+                        <div class="script-box">"Dari pengalaman ini, saya belajar bahwa..."</div>
+                    </div>
+                </div>
+                <div class="accordion-item v4_accordion">
+                    <div class="accordion-header"><span>🎙️ Pilar 3: Penyampaian (The Vibe)</span><span class="accordion-icon">▼</span></div>
+                    <div class="accordion-content">
+                        <ul style="padding-left: 20px; color: var(--text-muted); font-size: 14px;">
+                            <li><strong>Jujur pada batasan:</strong> "Saya belum pernah, tapi begini cara saya belajar..."</li>
+                            <li><strong>Tenang saat jeda:</strong> Berhenti 2 detik itu cerdas.</li>
+                            <li><strong>Antusias:</strong> Biarkan senyum terlihat.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <section class="reflection-box">
+                <div class="reflection-title">🧠 Cek Pemahaman: Bab 2</div>
+                <p style="font-size: 15px; margin-bottom: 16px;">Mana yang paling sering kamu lupakan?</p>
+                <div class="radio-group">
+                    <label class="radio-label"><input type="radio" name="v4_reflection" value="1"> Struktur</label>
+                    <label class="radio-label"><input type="radio" name="v4_reflection" value="2"> Nilai</label>
+                    <label class="radio-label"><input type="radio" name="v4_reflection" value="3"> Penyampaian</label>
+                </div>
+                <div id="v4_feedback" class="feedback-msg"></div>
+            </section>
+        </div>
+
+        <!-- VIEW 5: BAB 3 -->
+        <div id="view-5" class="view-section">
+            <header class="chapter-header">
+                <div class="chapter-label">Bab 3</div>
+                <h1 class="chapter-title">Ujian Sebenarnya: Follow-up yang Menekan</h1>
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" alt="Thinking" class="hero-img">
+            </header>
+            <section>
+                <p>Di sinilah 90% kandidat <em>fresh graduate</em> gugur. Gunakan <strong>3 Langkah Sederhana</strong> ini.</p>
+                <p class="italic-muted" style="text-align: center; margin: 24px 0;">👇 Klik setiap langkah 👇</p>
+            </section>
+            <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=800&q=80" alt="Jabat tangan" class="hero-img" style="margin-top: 32px; aspect-ratio: 4/3;">
+            <section>
+                <div class="accordion-item v5_accordion">
+                    <div class="accordion-header"><span>⏸️ Langkah 1: Jeda & Tarik Napas</span><span class="accordion-icon">▼</span></div>
+                    <div class="accordion-content"><p>Jangan langsung menjawab. Ambil waktu 2-3 detik. Ini menunjukkan kamu BERPIKIR.</p></div>
+                </div>
+                <div class="accordion-item v5_accordion">
+                    <div class="accordion-header"><span> Langkah 2: Akui & Validasi</span><span class="accordion-icon">▼</span></div>
+                    <div class="accordion-content">
+                        <p>Lunakkan suasana:</p>
+                        <div class="script-box">"Pertanyaan yang sangat valid, Pak/Bu. Saya mengerti kekhawatiran Bapak/Ibu..."</div>
+                    </div>
+                </div>
+                <div class="accordion-item v5_accordion">
+                    <div class="accordion-header"><span>🔄 Langkah 3: Reframe (Alihkan ke Solusi)</span><span class="accordion-icon">▼</span></div>
+                    <div class="accordion-content">
+                        <p>Buktikan kamu solutif:</p>
+                        <div class="script-box">"Namun, jika saya berada di situasi itu, langkah pertama yang akan saya ambil adalah..."</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FITUR BARU: CARA BERTANYA FOLLOW-UP -->
+            <h2 style="margin-top: 40px;">❓ Cara Bertanya Soal Kelanjutan</h2>
+            <div class="card" style="border-left: 4px solid var(--accent-sage);">
+                <p style="font-size: 14px; margin-bottom: 12px;">Jika interview hampir selesai dan kamu ingin tahu status tanpa terlihat desperate, gunakan kalimat ini:</p>
+                <div class="script-box" style="border-color: var(--accent-sage);">"Terima kasih atas waktunya, Pak/Bu. Boleh saya tahu estimasi kapan saya akan mendapatkan kabar untuk tahapan selanjutnya? Sekalipun hasilnya belum beruntung, saya sangat terbuka untuk masukan agar bisa lebih baik ke depannya."</div>
+            </div>
+
+            <section class="simulator-box">
+                <div class="simulator-title"> Simulasi Respons: Uji Nyali</div>
+                <p style="font-size: 14px; margin-bottom: 16px; color: var(--text-muted);">HRD menatapmu dan bertanya:</p>
+                <div class="hr-question">"Jawabanmu terdengar bagus di atas kertas, tapi kamu belum punya pengalaman nyata. Bagaimana menjamin bisa langsung bekerja?"</div>
+                <p style="font-size: 14px; margin-bottom: 12px; font-weight: 600;">Pilih respons terbaikmu:</p>
+                <button class="option-btn" onclick="checkAnswerV5(this, 'A')">A. "Saya yakin bisa, Pak/Bu. Saya cepat belajar dan di kampus saya selalu dapat nilai A."</button>
+                <button class="option-btn" onclick="checkAnswerV5(this, 'B')">B. "Pertanyaan yang sangat valid, Pak/Bu. Saya mengerti kekhawatiran Bapak/Ibu. Meski pengalaman lapangan saya terbatas, saya punya rekam jejak belajar mandiri yang cepat. Contohnya, saat saya harus menguasai software X dalam 3 hari untuk tugas akhir..."</button>
+                <button class="option-btn" onclick="checkAnswerV5(this, 'C')">C. "Kalau begitu, apakah perusahaan bersedia memberikan pelatihan intensif untuk saya di bulan pertama?"</button>
+                <div id="v5_sim_feedback" class="simulator-feedback"></div>
+            </section>
+        </div>
+
+        <!-- VIEW 6: BAB 4 -->
+        <div id="view-6" class="view-section">
+            <header class="chapter-header">
+                <div class="chapter-label">Bab 4</div>
+                <h1 class="chapter-title">Zona Praktik: Racik Jawabanmu</h1>
+                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" alt="Writing" class="hero-img">
+            </header>
+            <section>
+                <p>Saatnya kamu meracik jawabanmu sendiri.</p>
+                <p class="highlight" style="display:inline-block; margin-bottom: 24px;"> Catatan: Tulisanmu otomatis tersimpan di perangkat ini.</p>
+            </section>
+            <!-- PERBAIKAN GAMBAR 2 -->
+            <img src="https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=800&q=80" alt="Menulis" class="hero-img" style="margin-top: 32px; aspect-ratio: 4/3;">
+            
+            <h2>📝 Latihan 1: Kerangka 3 Bagian</h2>
+            <div class="worksheet-section">
+                <div class="input-group">
+                    <label class="form-label">Pertanyaan Interview</label>
+                    <input type="text" id="v6_l1_pertanyaan" class="form-input" placeholder="Tulis pertanyaannya di sini...">
+                </div>
+                <div class="input-group">
+                    <label class="form-label">1. Konteks</label>
+                    <textarea id="v6_l1_konteks" class="form-textarea" placeholder="Dulu, saat saya menjadi..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label class="form-label">2. Tindakan</label>
+                    <textarea id="v6_l1_tindakan" class="form-textarea" placeholder="Saya segera membuat..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label class="form-label">3. Hasil</label>
+                    <textarea id="v6_l1_hasil" class="form-textarea" placeholder="Acara berhasil berjalan..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label class="form-label">4. Nilai / The Soul</label>
+                    <textarea id="v6_l1_nilai" class="form-textarea" placeholder="Dari sini saya belajar..."></textarea>
+                </div>
+                <button class="btn-action btn-primary" onclick="generatePreviewV6('l1')">✨ Lihat Preview Jawaban</button>
+                <button class="btn-action btn-secondary" onclick="clearFormV6('l1')">🗑️ Hapus & Mulai Ulang</button>
+                <div id="preview-v6-l1" class="preview-card">
+                    <div class="preview-title">🎙️ Script Jawabanmu:</div>
+                    <div id="text-v6-l1" class="preview-text"></div>
+                </div>
+            </div>
+
+            <!-- FITUR BARU: BANK PERTANYAAN HR -->
+            <h2 style="margin-top: 40px;"> Bank Pertanyaan HR (Klik untuk lihat cara jawab)</h2>
+            <div class="accordion-item v6_accordion">
+                <div class="accordion-header"><span>🤝 Kerjasama Tim yang Sulit</span><span class="accordion-icon">▼</span></div>
+                <div class="accordion-content">
+                    <p><strong>Pertanyaan:</strong> "Ceritakan pengalamanmu bekerja dengan orang yang sulit diajak kerjasama."</p>
+                    <p><strong>Kunci Jawaban:</strong> Fokus pada <em>usaha adaptasimu</em>, bukan mengeluh tentang orangnya. Akui bahwa gaya kerja berbeda itu wajar, lalu jelaskan satu langkah spesifik yang kamu ambil untuk menjembatani perbedaan tersebut (misal: membuat jadwal check-in mingguan).</p>
+                </div>
+            </div>
+            <div class="accordion-item v6_accordion">
+                <div class="accordion-header"><span>🏆 Momen Terbaik & Terburuk</span><span class="accordion-icon">▼</span></div>
+                <div class="accordion-content">
+                    <p><strong>Pertanyaan:</strong> "Apa pencapaian terbaik dan kegagalan terbesarmu?"</p>
+                    <p><strong>Kunci Jawaban:</strong> Untuk terbaik, pilih yang ada <em>kontribusi spesifikmu</em> (bukan hanya "tim kami menang"). Untuk terburuk, pilih kegagalan yang <em>sudah kamu perbaiki</em> dan ada pelajaran nyata yang kamu terapkan di proyek setelahnya.</p>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 40px;">️ Latihan 2: Anti-Panic Follow-up</h2>
+            <div class="worksheet-section">
+                <p style="font-size: 14px; margin-bottom: 16px;"><strong>Skenario:</strong> HR bertanya, <em>"Kamu belum punya pengalaman lapangan. Bagaimana menjamin bisa langsung bekerja?"</em></p>
+                <div class="input-group">
+                    <label class="form-label">Langkah 1: Jeda & Validasi</label>
+                    <textarea id="v6_l2_validasi" class="form-textarea" placeholder="Pertanyaan yang sangat valid..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label class="form-label">Langkah 2: Reframe ke Solusi</label>
+                    <textarea id="v6_l2_reframe" class="form-textarea" placeholder="Meski pengalaman lapangan saya terbatas..."></textarea>
+                </div>
+                <button class="btn-action btn-primary" onclick="generatePreviewV6('l2')">✨ Lihat Preview Jawaban</button>
+                <button class="btn-action btn-secondary" onclick="clearFormV6('l2')">🗑️ Hapus & Mulai Ulang</button>
+                <div id="preview-v6-l2" class="preview-card">
+                    <div class="preview-title">️ Script Jawabanmu:</div>
+                    <div id="text-v6-l2" class="preview-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 7: BAB 5 -->
+        <div id="view-7" class="view-section">
+            <header class="chapter-header">
+                <div class="chapter-label">Bab 5</div>
+                <h1 class="chapter-title">Cheat Sheet & Battle Cards</h1>
+                <img src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?auto=format&fit=crop&w=800&q=80" alt="Notes" class="hero-img">
+            </header>
+            <section>
+                <p>Ini adalah "senjata rahasia" kamu. Screenshot halaman ini!</p>
+            </section>
+            <img src="https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=800&q=80" alt="Catatan" class="hero-img" style="margin-top: 32px; aspect-ratio: 4/3;">
+            <div class="battle-card card-terracotta">
+                <div class="bc-header">
+                    <div class="bc-icon">🏗️</div>
+                    <div><div class="bc-title">Kerangka 3 Bagian</div><div class="bc-subtitle">Rumus Jawaban Anti-Ragu</div></div>
+                </div>
+                <div class="bc-section">
+                    <div class="bc-label label-terracotta">1. Struktur (The Structure)</div>
+                    <p style="font-size: 14px; margin-bottom: 4px;">Jawab dengan Alur, Bukan Melantur</p>
+                    <ul style="padding-left: 20px; font-size: 13px; color: var(--text-muted);">
+                        <li><strong>Konteks:</strong> Situasi spesifik (1 kalimat).</li>
+                        <li><strong>Tindakan:</strong> Apa yang <em>AKU</em> lakukan (2-3 kalimat).</li>
+                        <li><strong>Hasil:</strong> Dampak positifnya (1 kalimat).</li>
+                    </ul>
+                </div>
+                <div class="bc-section">
+                    <div class="bc-label label-terracotta">2. Nilai (The Soul)</div>
+                    <p style="font-size: 14px; margin-bottom: 4px;">Beri "Nyawa" pada Jawabanmu</p>
+                    <div class="script-box" style="border-color: var(--accent-terracotta);">"Dari sini, saya belajar bahwa..."</div>
+                </div>
+                <div class="bc-section">
+                    <div class="bc-label label-terracotta">3. Penyampaian (The Vibe)</div>
+                    <p style="font-size: 14px; margin: 0;">Jujur pada batasan. Tenang saat jeda. Biarkan antusiasme terlihat.</p>
+                </div>
+            </div>
+
+            <div class="battle-card card-sage">
+                <div class="bc-header">
+                    <div class="bc-icon">🛡️</div>
+                    <div><div class="bc-title">Anti-Panic Follow-up</div><div class="bc-subtitle">3 Langkah Saat HR Menekan</div></div>
+                </div>
+                <div class="bc-section">
+                    <div class="bc-label label-sage">Langkah 1: Jeda (Pause)</div>
+                    <p style="font-size: 14px; margin: 0;">Jangan langsung menjawab! Tarik napas 2-3 detik.</p>
+                </div>
+                <div class="bc-section">
+                    <div class="bc-label label-sage">Langkah 2: Akui (Acknowledge)</div>
+                    <div class="script-box" id="v7_script_acknowledge">"Pertanyaan yang sangat valid, Pak/Bu. Saya mengerti kekhawatiran Bapak/Ibu mengenai..."</div>
+                </div>
+                <div class="bc-section">
+                    <div class="bc-label label-sage">Langkah 3: Reframe (Alihkan)</div>
+                    <div class="script-box" id="v7_script_reframe">"Namun, jika saya berada di situasi itu, langkah pertama yang akan saya ambil adalah..."</div>
+                </div>
+                <button class="copy-btn" onclick="copyScriptsV7()">
+                    <span id="v7_copy_icon">📋</span> <span id="v7_copy_text">Salin Script ke Notes</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW 8: BAB 6 -->
+        <div id="view-8" class="view-section">
+            <header class="chapter-header">
+                <div class="chapter-label">Bab 6</div>
+                <h1 class="chapter-title">Penutup & Ringkasan Perjalanan</h1>
+                <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80" alt="Reflection" class="hero-img">
+            </header>
+            <div class="closing-message">
+                <div class="closing-emoji">🎯</div>
+                <h2>Kamu Sudah Punya Peta-nya</h2>
+                <p>Selamat! Kamu telah menyelesaikan seluruh ebook ini.</p>
+                <p style="font-weight: 700; color: var(--accent-terracotta); margin-top: 16px;">Ingat: Persiapan adalah kunci keberhasilan!</p>
+            </div>
+            <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=800&q=80" alt="Refleksi" class="hero-img" style="margin-top: 32px; aspect-ratio: 4/3;">
+            <div class="card card-sage">
+                <div class="bc-header">
+                    <div class="bc-icon"></div>
+                    <div><div class="bc-title">3 Hal yang Bisa Kamu Kontrol</div></div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number">1</div>
+                    <div class="summary-content"><h4>Beri Detail yang Spesifik</h4><p>Cerita yang hanya kamu yang tahu lebih berharga.</p></div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number">2</div>
+                    <div class="summary-content"><h4>Akui Kekurangan yang Masuk Akal</h4><p>HR lebih percaya pada jawaban dengan sedikit ketidaksempurnaan yang jujur.</p></div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-number">3</div>
+                    <div class="summary-content"><h4>Tetap Tenang Saat Follow-up Menekan</h4><p>Gunakan rumus Jeda → Akui → Reframe.</p></div>
+                </div>
+            </div>
+            <div class="card card-terracotta">
+                <div class="bc-header">
+                    <div class="bc-icon"></div>
+                    <div><div class="bc-title">Kembali ke Daftar Isi</div></div>
+                </div>
+                <ul class="toc-list">
+                    <div class="toc-item" onclick="showView(3)"><span class="toc-chapter">Bab 1</span><span class="toc-title">Jebakan "Jawaban Sempurna"</span><span>→</span></div>
+                    <div class="toc-item" onclick="showView(4)"><span class="toc-chapter">Bab 2</span><span class="toc-title">Kerangka 3 Bagian</span><span>→</span></div>
+                    <div class="toc-item" onclick="showView(5)"><span class="toc-chapter">Bab 3</span><span class="toc-title">Follow-up yang Menekan</span><span>→</span></div>
+                    <div class="toc-item" onclick="showView(6)"><span class="toc-chapter">Bab 4</span><span class="toc-title">Zona Praktik</span><span>→</span></div>
+                    <div class="toc-item" onclick="showView(7)"><span class="toc-chapter">Bab 5</span><span class="toc-title">Battle Cards</span><span>→</span></div>
+                    <div class="toc-item current" onclick="showView(8)"><span class="toc-chapter">Bab 6</span><span class="toc-title">Penutup</span><span>✓</span></div>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="bc-header">
+                    <div class="bc-icon">⚖️</div>
+                    <div><div class="bc-title">Hak Cipta & Penafian</div></div>
+                </div>
+                <div class="disclaimer-text">
+                    <p><strong>© 2026 Kacamata Senior Assessor.</strong> Hak Cipta Dilindungi Undang-Undang.</p>
+                    <p style="margin-top: 12px;">Ebook ini disusun berdasarkan observasi praktis terhadap proses interview HR.</p>
+                    <p style="margin-top: 12px;"><strong>Penafian:</strong> Isi ebook bersifat panduan praktis. Penulis tidak menjamin hasil tertentu.</p>
+                    <p style="margin-top: 12px; font-style: italic; color: var(--accent-terracotta);">Dirancang untuk membantu kamu tampil percaya diri, bukan sempurna. ✨</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav">
+        <button id="btn-prev" class="nav-btn btn-prev" onclick="prevView()">← Sebelumnya</button>
+        <button id="btn-next" class="nav-btn btn-next" onclick="nextView()">Selanjutnya →</button>
+    </div>
+
+    <div id="toc-modal" class="toc-modal" onclick="closeTOC(event)">
+        <div class="toc-content" onclick="event.stopPropagation()">
+            <div class="toc-header">
+                <h3>Daftar Isi</h3>
+                <button class="close-btn" onclick="closeTOC()">✕</button>
+            </div>
+            <ul class="toc-list">
+                <div class="toc-item" onclick="showView(0); closeTOC();"><span class="toc-chapter">Cover</span><span class="toc-title">Halaman Utama</span></div>
+                <div class="toc-item" onclick="showView(1); closeTOC();"><span class="toc-chapter">Legal</span><span class="toc-title">Hak Cipta</span></div>
+                <div class="toc-item" onclick="showView(2); closeTOC();"><span class="toc-chapter">TOC</span><span class="toc-title">Daftar Isi</span></div>
+                <div class="toc-item" onclick="showView(3); closeTOC();"><span class="toc-chapter">Bab 1</span><span class="toc-title">Jebakan Jawaban Sempurna</span></div>
+                <div class="toc-item" onclick="showView(4); closeTOC();"><span class="toc-chapter">Bab 2</span><span class="toc-title">Kerangka 3 Bagian</span></div>
+                <div class="toc-item" onclick="showView(5); closeTOC();"><span class="toc-chapter">Bab 3</span><span class="toc-title">Follow-up Menekan</span></div>
+                <div class="toc-item" onclick="showView(6); closeTOC();"><span class="toc-chapter">Bab 4</span><span class="toc-title">Zona Praktik</span></div>
+                <div class="toc-item" onclick="showView(7); closeTOC();"><span class="toc-chapter">Bab 5</span><span class="toc-title">Battle Cards</span></div>
+                <div class="toc-item" onclick="showView(8); closeTOC();"><span class="toc-chapter">Bab 6</span><span class="toc-title">Penutup</span></div>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentView = 0;
+        const totalViews = 9;
+
+        function showView(index) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + index).classList.add('active');
+            const progress = (index / (totalViews - 1)) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('btn-prev').style.visibility = index === 0 ? 'hidden' : 'visible';
+            const nextBtn = document.getElementById('btn-next');
+            if (index === totalViews - 1) { nextBtn.innerText = '🔄 Mulai Ulang'; } 
+            else if (index === 0) { nextBtn.innerText = 'Mulai Baca →'; }
+            else if (index === 1) { nextBtn.innerText = 'Ke Daftar Isi →'; }
+            else if (index === 2) { nextBtn.innerText = 'Mulai Bab 1 →'; }
+            else { nextBtn.innerText = 'Selanjutnya →'; }
+            currentView = index;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextView() { if (currentView < totalViews - 1) showView(currentView + 1); else showView(0); }
+        function prevView() { if (currentView > 0) showView(currentView - 1); }
+
+        function openTOC() { document.getElementById('toc-modal').classList.add('active'); }
+        function closeTOC(e) { if (!e || e.target.id === 'toc-modal' || e.target.classList.contains('close-btn')) { document.getElementById('toc-modal').classList.remove('active'); } }
+
+        function setupReflection(viewPrefix, feedbackId, texts) {
+            const radios = document.querySelectorAll(`input[name="${viewPrefix}_reflection"]`);
+            const feedback = document.getElementById(feedbackId);
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.querySelectorAll(`input[name="${viewPrefix}_reflection"]`).forEach(r => r.closest('.radio-label').classList.remove('selected'));
+                    this.closest('.radio-label').classList.add('selected');
+                    feedback.textContent = texts[this.value];
+                    feedback.style.display = 'block';
+                });
+            });
+        }
+
+        setupReflection('v3', 'v3_feedback', {
+            '1': "Wajar! Menghafal skrip memang terasa aman. Tapi di Bab 2, kita akan ubah ini menjadi 'Kerangka' yang lebih fleksibel.",
+            '2': "Ini tanda bahwa fondasi jawabanmu belum sepenuhnya 'menyatu'. Di Bab 3, kita akan latih otot ketenanganmu.",
+            '3': "Detail spesifik adalah kunci! Di Bab 2, kamu akan belajar cara menambahkan 'nyawa' pada cerita umummu."
+        });
+
+        setupReflection('v4', 'v4_feedback', {
+            '1': "Tidak masalah! Di Bab 4 (Worksheet), kita akan latih kamu merapikan struktur dengan formula Konteks-Tindakan-Hasil.",
+            '2': "Ini yang paling sering dilupakan! Ingat, HRD mencari manusia yang belajar, bukan robot yang sempurna.",
+            '3': "Wajar! Grogi itu manusiawi. Di Bab 3, kita akan bahas cara 'menipu' otak agar tetap tenang saat di-press HR."
+        });
+
+        document.querySelectorAll('.v4_accordion .accordion-header, .v5_accordion .accordion-header, .v6_accordion .accordion-header').forEach(acc => {
+            acc.addEventListener('click', function() {
+                const item = this.parentElement;
+                const isActive = item.classList.contains('active');
+                const parent = item.parentElement;
+                parent.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('active'));
+                if (!isActive) item.classList.add('active');
+            });
+        });
+
+        function checkAnswerV5(btn, choice) {
+            const feedback = document.getElementById('v5_sim_feedback');
+            const allButtons = document.querySelectorAll('.option-btn');
+            if (btn.classList.contains('correct')) return;
+            if (choice === 'B') {
+                btn.classList.add('correct');
+                allButtons.forEach(b => b.disabled = true);
+                feedback.className = 'simulator-feedback show-correct';
+                feedback.innerHTML = '<strong> Tepat Sekali!</strong><br>Kamu menggunakan Langkah 2 (Validasi) dan Langkah 3 (Reframe dengan bukti spesifik).';
+            } else {
+                btn.classList.add('wrong');
+                btn.disabled = true;
+                feedback.className = 'simulator-feedback show-wrong';
+                if (choice === 'A') feedback.innerHTML = '<strong>⚠️ Kurang Tepat. Coba lagi!</strong><br>Ini terdengar defensif dan terlalu umum.';
+                else if (choice === 'C') feedback.innerHTML = '<strong>⚠️ Berisiko Tinggi. Coba lagi!</strong><br>Ini membebani perusahaan di awal.';
+            }
+            feedback.style.display = 'block';
+        }
+
+        const v6Inputs = document.querySelectorAll('#view-6 .form-input, #view-6 .form-textarea');
+        window.addEventListener('DOMContentLoaded', () => {
+            v6Inputs.forEach(input => {
+                const savedValue = localStorage.getItem('ksa_' + input.id);
+                if (savedValue) input.value = savedValue;
+                input.addEventListener('input', (e) => localStorage.setItem('ksa_' + e.target.id, e.target.value));
+            });
+        });
+
+        function generatePreviewV6(id) {
+            const previewCard = document.getElementById(`preview-v6-${id}`);
+            const textContainer = document.getElementById(`text-v6-${id}`);
+            let finalText = "";
+            if (id === 'l1') {
+                const q = document.getElementById('v6_l1_pertanyaan').value;
+                const k = document.getElementById('v6_l1_konteks').value;
+                const t = document.getElementById('v6_l1_tindakan').value;
+                const h = document.getElementById('v6_l1_hasil').value;
+                const n = document.getElementById('v6_l1_nilai').value;
+                if(q) finalText += `<strong>HR:</strong> "${q}"<br><br>`;
+                if(k) finalText += `<strong>Aku:</strong> "${k} `;
+                if(t) finalText += `${t} `;
+                if(h) finalText += `${h} `;
+                if(n) finalText += `${n}"`;
+            } else if (id === 'l2') {
+                const v = document.getElementById('v6_l2_validasi').value;
+                const r = document.getElementById('v6_l2_reframe').value;
+                if(v) finalText += `"${v} `;
+                if(r) finalText += `${r}"`;
+            }
+            textContainer.innerHTML = finalText.trim() ? finalText : "<em>Isi formulir di atas terlebih dahulu...</em>";
+            previewCard.style.display = 'block';
+            previewCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function clearFormV6(id) {
+            if(!confirm("Yakin ingin menghapus semua tulisan di bagian ini?")) return;
+            let inputsToClear = id === 'l1' ? ['v6_l1_pertanyaan', 'v6_l1_konteks', 'v6_l1_tindakan', 'v6_l1_hasil', 'v6_l1_nilai'] : ['v6_l2_validasi', 'v6_l2_reframe'];
+            inputsToClear.forEach(inputId => {
+                document.getElementById(inputId).value = "";
+                localStorage.removeItem('ksa_' + inputId);
+            });
+            document.getElementById(`preview-v6-${id}`).style.display = 'none';
+        }
+
+        function copyScriptsV7() {
+            const text1 = document.getElementById('v7_script_acknowledge').innerText;
+            const text2 = document.getElementById('v7_script_reframe').innerText;
+            const fullText = `Script Anti-Panic Follow-up:\n\n1. Akui:\n"${text1}"\n\n2. Reframe:\n"${text2}"`;
+            const textArea = document.createElement("textarea");
+            textArea.value = fullText;
+            textArea.style.position = "fixed"; textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus(); textArea.select();
+            let successful = false;
+            try { successful = document.execCommand('copy'); } catch (err) { successful = false; }
+            document.body.removeChild(textArea);
+            const btn = document.querySelector('.copy-btn');
+            const icon = document.getElementById('v7_copy_icon');
+            const text = document.getElementById('v7_copy_text');
+            if (successful) {
+                btn.classList.add('copied');
+                icon.textContent = '✅'; text.textContent = 'Tersalin di Clipboard!';
+                setTimeout(() => { btn.classList.remove('copied'); icon.textContent = '📋'; text.textContent = 'Salin Script ke Notes'; }, 2500);
+            } else { alert('Gagal menyalin otomatis.'); }
+        }
+
+        showView(0);
+    </script>
+</body>
+</html>
