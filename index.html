@@ -1,739 +1,185 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kacamata Senior Assessor - T0 Final</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        /* --- DESIGN SYSTEM (EARTH TONE) --- */
-        :root {
-            --bg-color: #FAF7F2;
-            --card-bg: #FFFFFF;
-            --text-main: #2D2A26;
-            --text-muted: #6B635B;
-            --accent-terracotta: #B5654A;
-            --accent-sage: #8A9A85;
-            --border-color: #EAE3D9;
-            --success-green: #5CB85C;
-            --error-red: #D9534F;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Akses Ebook</title>
+  <style>
+    * { box-sizing: border-box; }
 
-        /* --- RESET & BASE --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            padding-top: 60px;
-            padding-bottom: 80px;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #202938;
+    }
 
-        /* --- GLOBAL UI --- */
-        .top-bar { position: fixed; top: 0; left: 0; right: 0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 12px 20px; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
-        .top-title { font-size: 14px; font-weight: 700; color: var(--text-main); }
-        .menu-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); }
-        
-        .progress-container { position: fixed; top: 53px; left: 0; right: 0; height: 4px; background: var(--border-color); z-index: 99; }
-        .progress-fill { height: 100%; background: var(--accent-terracotta); width: 0%; transition: width 0.3s ease; }
-        
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-top: 1px solid var(--border-color); padding: 12px 20px; z-index: 100; display: flex; justify-content: space-between; gap: 12px; }
-        .nav-btn { flex: 1; padding: 14px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
-        .btn-prev { background: var(--border-color); color: var(--text-main); }
-        .btn-next { background: var(--text-main); color: #fff; }
-        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .container { max-width: 640px; margin: 0 auto; padding: 24px 20px; }
-        .view-section { display: none; animation: fadeIn 0.4s ease; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 32px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.08);
+    }
 
-        /* --- TYPOGRAPHY --- */
-        .chapter-header { text-align: center; margin-bottom: 32px; }
-        .chapter-label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-terracotta); font-weight: 700; margin-bottom: 8px; }
-        .chapter-title { font-size: 26px; font-weight: 800; line-height: 1.2; color: var(--text-main); margin-bottom: 24px; }
-        .hero-img { width: 100%; border-radius: 16px; box-shadow: 0 8px 24px rgba(45, 42, 38, 0.08); margin-bottom: 24px; object-fit: cover; display: block; aspect-ratio: 16/9; background-color: #EAE3D9; }
-        h2 { font-size: 20px; font-weight: 700; margin: 32px 0 16px; color: var(--text-main); }
-        p { font-size: 16px; margin-bottom: 16px; color: var(--text-main); }
-        .highlight { background-color: rgba(181, 101, 74, 0.1); color: var(--accent-terracotta); padding: 2px 6px; border-radius: 4px; font-weight: 600; }
-        
-        /* --- COMPONENTS --- */
-        .btn-start { background: var(--accent-terracotta); color: #fff; padding: 16px 32px; border-radius: 30px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s; font-family: 'Inter', sans-serif; width: 100%; max-width: 300px; margin: 20px auto; display: block; }
-        .btn-start:hover { transform: scale(1.02); background: #9E533B; }
+    h1 { margin-top: 0; font-size: 26px; }
+    p { line-height: 1.6; color: #596579; }
 
-        .card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(45, 42, 38, 0.04); border: 1px solid var(--border-color); }
-        
-        /* --- AUTHOR SECTION --- */
-        .author-container { text-align: center; padding: 20px 0; }
-        .author-photo-placeholder { width: 100px; height: 100px; background: linear-gradient(135deg, var(--accent-terracotta), var(--accent-sage)); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; font-weight: 800; }
-        .author-quote { font-size: 18px; font-style: italic; color: var(--text-main); margin: 24px 0; padding: 0 10px; line-height: 1.5; }
-        .author-bio { text-align: left; font-size: 15px; color: var(--text-muted); line-height: 1.7; }
-        .author-bio strong { color: var(--text-main); }
+    label {
+      display: block;
+      margin: 22px 0 8px;
+      font-weight: bold;
+    }
 
-        /* --- CHECKLIST (BAB 1) --- */
-        .checklist-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s ease; }
-        .checklist-item:hover { border-color: var(--accent-sage); background: #FDFBF9; }
-        .checklist-item.checked { border-color: var(--accent-sage); background: rgba(138, 154, 133, 0.05); }
-        .checklist-header { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 15px; color: var(--text-main); }
-        .checklist-icon { width: 24px; height: 24px; border: 2px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: transparent; transition: all 0.2s; }
-        .checklist-item.checked .checklist-icon { background: var(--accent-sage); border-color: var(--accent-sage); color: white; }
-        .checklist-item.checked .checklist-icon::after { content: '✓'; }
-        .assessor-note { font-size: 13px; font-weight: 600; color: var(--accent-sage); background: rgba(138, 154, 133, 0.1); padding: 10px; border-radius: 8px; border-left: 3px solid var(--accent-sage); display: none; margin-top: 12px; animation: fadeIn 0.3s ease; }
-        .assessor-note.visible { display: block; }
+    input, button {
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
 
-        /* --- RED FLAG ACCORDION (BAB 2) --- */
-        .redflag-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 16px; overflow: hidden; transition: all 0.3s ease; }
-        .redflag-header { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 15px; color: var(--text-main); user-select: none; }
-        .redflag-header:hover { background-color: #FDFBF9; }
-        .redflag-icon { font-size: 20px; transition: transform 0.3s ease; color: var(--accent-terracotta); }
-        .redflag-item.active .redflag-icon { transform: rotate(180deg); }
-        .redflag-item.active { border-color: var(--accent-terracotta); box-shadow: 0 4px 12px rgba(181, 101, 74, 0.15); }
-        .redflag-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; padding: 0 20px; background-color: #FDFBF9; }
-        .redflag-item.active .redflag-content { max-height: 600px; padding: 0 20px 20px; }
-        .redflag-content p { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; }
-        .redflag-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-        .label-surface { color: var(--text-muted); }
-        .label-assessor { color: var(--accent-terracotta); }
-        .redflag-box { background: var(--card-bg); padding: 12px; border-radius: 8px; margin-top: 8px; font-size: 13px; line-height: 1.6; }
-        .redflag-box.surface { border-left: 3px solid var(--text-muted); }
-        .redflag-box.assessor { border-left: 3px solid var(--accent-terracotta); color: var(--accent-terracotta); font-weight: 600; }
+    input {
+      border: 1px solid #cbd2df;
+      margin-bottom: 14px;
+    }
 
-        /* --- CULTURE FIT TOGGLE (BAB 3) --- */
-        .toggle-container { display: flex; gap: 8px; margin-bottom: 24px; background: var(--card-bg); padding: 8px; border-radius: 12px; border: 1px solid var(--border-color); }
-        .toggle-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; background: transparent; color: var(--text-muted); }
-        .toggle-btn.active { background: var(--accent-sage); color: white; }
-        .toggle-content { display: none; animation: fadeIn 0.3s ease; }
-        .toggle-content.active { display: block; }
-        .trait-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
-        .trait-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-        .trait-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+    button {
+      border: 0;
+      background: #2347d5;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-        /* --- KERANGKA JEBAKAN (BAB 4) --- */
-        .framework-step { background: var(--card-bg); border-radius: 12px; padding: 16px; margin-bottom: 16px; border-left: 4px solid var(--accent-sage); }
-        .framework-step h3 { font-size: 16px; font-weight: 700; color: var(--accent-sage); margin-bottom: 8px; }
-        .framework-step p { font-size: 14px; color: var(--text-muted); margin: 0; }
-        .comparison-box { background: #FDFBF9; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-top: 24px; }
-        .comparison-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
-        .comparison-item { margin-bottom: 16px; }
-        .comparison-item:last-child { margin-bottom: 0; }
-        .comparison-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .label-robot { color: var(--error-red); }
-        .label-authentic { color: var(--success-green); }
-        .comparison-text { font-size: 14px; font-style: italic; color: var(--text-main); padding: 10px; background: var(--card-bg); border-radius: 8px; border-left: 3px solid var(--border-color); }
-        .comparison-item.authentic .comparison-text { border-left-color: var(--success-green); }
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
 
-        /* --- SIMULATOR (BAB 5) --- */
-        .simulator-box { background: #FFF8F5; border: 2px solid var(--accent-terracotta); border-radius: 16px; padding: 24px; margin-top: 32px; }
-        .simulator-title { font-size: 18px; font-weight: 700; color: var(--accent-terracotta); margin-bottom: 16px; }
-        .hr-question { background: var(--card-bg); padding: 16px; border-radius: 12px; font-weight: 600; margin-bottom: 20px; border-left: 4px solid var(--accent-terracotta); font-size: 15px; }
-        .option-btn { display: block; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; cursor: pointer; font-size: 14px; color: var(--text-main); transition: all 0.2s ease; font-family: inherit; }
-        .option-btn:hover:not(:disabled) { border-color: var(--accent-terracotta); background: #FFF8F5; }
-        .option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
-        .option-btn.correct { border-color: var(--success-green); background: #E8F5E9; color: #2E7D32; font-weight: 600; }
-        .option-btn.wrong { border-color: var(--error-red); background: #FFEBEE; color: #C62828; text-decoration: line-through; opacity: 0.6; }
-        .simulator-feedback { margin-top: 16px; padding: 16px; border-radius: 10px; font-size: 14px; display: none; animation: fadeIn 0.3s ease; }
-        .simulator-feedback.show-correct { background: #E8F5E9; color: #2E7D32; border: 1px solid var(--success-green); }
-        .simulator-feedback.show-wrong { background: #FFEBEE; color: #C62828; border: 1px solid var(--error-red); }
+    #message {
+      margin-top: 16px;
+      overflow-wrap: anywhere;
+    }
 
-        /* --- WORKSHEET (BAB 6) --- */
-        .worksheet-section { background: var(--card-bg); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(45, 42, 38, 0.04); border: 1px solid var(--border-color); }
-        .input-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
-        .form-hint { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 12px; font-style: italic; }
-        .form-input, .form-textarea { width: 100%; padding: 14px 16px; border: 1px solid var(--border-color); border-radius: 10px; font-family: inherit; font-size: 15px; color: var(--text-main); background: #FDFBF9; transition: all 0.2s ease; resize: vertical; }
-        .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--accent-sage); background: #fff; box-shadow: 0 0 0 3px rgba(138, 154, 133, 0.15); }
-        .form-textarea { min-height: 80px; }
-        .btn-action { display: block; width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; margin-bottom: 12px; font-family: inherit; }
-        .btn-primary { background: var(--accent-terracotta); color: #fff; }
-        .btn-primary:hover { background: #9E533B; }
-        .btn-secondary { background: #F0F4EF; color: var(--accent-sage); }
-        .btn-secondary:hover { background: #E8EFE7; }
-        .preview-card { display: none; background: #FFF8F5; border: 2px dashed var(--accent-terracotta); border-radius: 12px; padding: 20px; margin-top: 20px; animation: fadeIn 0.4s ease; }
-        .preview-title { font-size: 14px; font-weight: 700; color: var(--accent-terracotta); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-        .preview-text { font-size: 16px; line-height: 1.8; color: var(--text-main); }
-
-        /* --- CLOSING & CTA (VIEW 8) --- */
-        .closing-message { text-align: center; padding: 40px 24px; background: linear-gradient(135deg, rgba(181, 101, 74, 0.08), rgba(138, 154, 133, 0.08)); border-radius: 20px; margin-bottom: 32px; border: 1px solid var(--border-color); }
-        .closing-emoji { font-size: 56px; margin-bottom: 16px; }
-        .cta-box { background: var(--card-bg); border-radius: 16px; padding: 24px; text-align: center; border: 2px solid var(--accent-sage); margin-top: 32px; }
-        .cta-title { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; }
-        .cta-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
-        .btn-cta { background: var(--accent-sage); color: #fff; padding: 16px 32px; border-radius: 30px; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s; font-family: 'Inter', sans-serif; display: inline-block; text-decoration: none; }
-        .btn-cta:hover { transform: scale(1.02); background: #758570; }
-
-        /* --- TOC MODAL --- */
-        .toc-modal { position: fixed; inset: 0; background: rgba(45, 42, 38, 0.6); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .toc-modal.active { display: flex; animation: fadeIn 0.2s ease; }
-        .toc-content { background: var(--card-bg); width: 100%; max-width: 400px; border-radius: 20px; padding: 24px; max-height: 80vh; overflow-y: auto; }
-        .toc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .toc-header h3 { font-size: 18px; font-weight: 800; }
-        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
-        .toc-list { list-style: none; }
-        .toc-item { padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; }
-        .toc-item:last-child { border-bottom: none; }
-        .toc-item.locked { opacity: 0.4; cursor: not-allowed; }
-
-        /* --- REVISI V3 --- */
-        .assessor-note,.redflag-box,.comparison-text,.trait-desc,.framework-step p,.redflag-content p,.option-btn,.simulator-feedback,.author-bio{font-size:15px}
-        .form-hint{font-size:14px}
-        .menu-btn,.close-btn{min-width:44px;min-height:44px}
-        .nav-btn{min-height:48px}
-        .checklist-item,.redflag-header{min-height:48px}
-        .toc-item{padding:14px 0;min-height:48px;align-items:center}
-        .redflag-item.active .redflag-content{max-height:1200px}
-        .option-btn.wrong{text-decoration:none;opacity:1}
-        .option-btn.tried{border-color:var(--text-muted);background:#FDFBF9}
-        .simulator-feedback.show-wrong{background:#FFF8F5;color:var(--text-main);border:1px solid var(--accent-terracotta)}
-        .sim-n{font-size:13px;color:var(--text-muted);margin-bottom:8px}
-        .saved-ind{font-size:13px;color:var(--accent-sage);min-height:18px;margin-bottom:8px}
-        .mini-cta{background:#FFF8F5;border:1px solid var(--accent-terracotta);border-radius:16px;padding:20px;margin-top:24px;text-align:center}
-        .mini-cta p{font-size:15px;color:var(--text-muted)}
-
-        .bubble{padding:14px 16px;border-radius:16px;margin-bottom:10px;font-size:15px;line-height:1.6}
-        .bubble span{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px}
-        .bubble.hr{background:#F3EFEA}.bubble.me{background:#fff;border:1px solid rgba(0,0,0,.12)}
-        .hl-r{background:rgba(181,101,74,.16);border-bottom:2px solid var(--accent-terracotta);border-radius:3px}
-        .hl-g{background:rgba(122,148,120,.22);border-bottom:2px solid var(--accent-sage);border-radius:3px}
-        .hl-legend{font-size:13px;color:var(--text-muted);margin:4px 0 16px}
-        .reading{font-size:15px;color:var(--text-muted);padding:16px 0;animation:rd 1s ease-in-out infinite alternate}
-        @keyframes rd{from{opacity:.35}to{opacity:1}}
-        .rep-verdict{border:1px solid var(--accent-terracotta);border-radius:16px;padding:18px;margin:8px 0 16px;background:#FFF8F5}
-        .rep-label{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--text-muted)}
-        .rep-tier{font-size:19px;font-weight:700;margin:6px 0}
-        .rep-quote{font-size:15px;font-style:italic;margin:0}
-        .rep-row{border-top:1px solid rgba(0,0,0,.1);padding:12px 0}
-        .rep-row p{margin:4px 0 0;font-size:15px}
-        .rep-head{display:flex;justify-content:space-between;font-weight:600;font-size:15px}
-        .dots{color:var(--accent-terracotta);letter-spacing:3px}
-        .rep-probe{background:#F3EFEA;border-radius:12px;padding:14px;margin:16px 0;font-size:15px}
-        .rep-meta,.rep-disc{font-size:13px;color:var(--text-muted);margin:8px 0}
-
-        .q-chips{display:flex;flex-wrap:wrap;gap:8px}
-        .q-chip{border:1px solid rgba(0,0,0,.2);background:#fff;border-radius:999px;padding:10px 14px;font-size:14px;min-height:44px;cursor:pointer;font-family:inherit;color:var(--text-main)}
-        .q-chip.active{border-color:var(--accent-terracotta);background:#FFF8F5;font-weight:600}
-        .q-guide{background:#F3EFEA;border-radius:14px;padding:16px;margin:4px 0 20px;font-size:15px}
-        .q-guide p{margin:0 0 8px}
-        .script-sec{margin-bottom:10px}
-        .script-sec small{display:block;font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:.04em;text-transform:uppercase}
-
-        /* --- CETAK / PDF --- */
-        .print-only{display:none}
-        @media print{
-            *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-            .top-bar,.progress-container,.bottom-nav,.toc-modal,.mini-cta,.btn-start,.menu-btn,.toggle-container,.saved-ind,.simulator-box,#view-7 .worksheet-section,.redflag-icon,#view-0 p button{display:none!important}
-            body{background:#fff;color:#2D2A26;font-size:11pt;line-height:1.55}
-            .container{max-width:none;margin:0;padding:0}
-            .view-section{display:block!important;animation:none!important;margin-bottom:8mm}
-            .redflag-content{max-height:none!important;overflow:visible!important;padding:0 14px 12px!important}
-            .redflag-item,.card,.checklist-item,.comparison-box,.trait-item,.pq{box-shadow:none!important;break-inside:avoid}
-            .assessor-note{display:block!important}
-            .toggle-content{display:block!important}
-            .chapter-title{font-size:20pt}
-            .print-only{display:block}
-            .print-only h2{font-size:15pt;margin:10mm 0 3mm}
-            .print-only h3{font-size:12pt;margin:6mm 0 2mm}
-            .print-only p{font-size:10.5pt;margin:0 0 2mm}
-            .pn{color:#6b655d}
-            .ph{display:block;font-size:9pt;color:#8a847b;font-style:italic}
-            .wl{background:repeating-linear-gradient(to bottom,transparent 0,transparent 7.4mm,#9a948c 7.4mm,#9a948c 7.7mm);margin-bottom:4mm}
-            .wl-filled{border:1px solid #bbb;padding:6px 8px;white-space:pre-wrap;margin-bottom:4mm;font-size:10.5pt}
-            a.t1-link::after{content:" (" attr(href) ")";font-size:9pt;font-weight:400;word-break:break-all}
-            /* Opsi A: Buku (B5) */
-            body.print-book .view-section{break-before:page;margin-bottom:0}
-            body.print-book #view-0{break-before:auto;min-height:200mm;display:flex!important;flex-direction:column;justify-content:center;text-align:center}
-            body.print-book .ws-q{break-before:auto}
-            /* Opsi B: Workbook (A4) */
-            body.print-work{font-size:10pt;line-height:1.45}
-            body.print-work .view-section{break-before:auto}
-            body.print-work #view-7,body.print-work #view-8{break-before:page}
-            body.print-work #view-0{text-align:left;border-bottom:2px solid #C87851;padding-bottom:6mm}
-            body.print-work .chapter-header{text-align:left;margin-bottom:5mm;border-bottom:1.5px solid #C87851}
-            body.print-work .chapter-title{font-size:15pt;margin-bottom:3mm}
-            body.print-work .checklist-item{display:inline-block;width:48.5%;vertical-align:top;margin-right:1%}
-            body.print-work .ws-q{break-before:page}
-        }
-    </style>
+    .hint { font-size: 13px; }
+  </style>
 </head>
 <body>
+  <main class="card">
+    <h1>Akses Ebook</h1>
+    <p>Masukkan kode akses yang kamu terima setelah pembelian.</p>
 
-    <!-- TOP BAR -->
-    <div class="top-bar">
-        <div class="top-title">Kacamata Senior Assessor</div>
-        <div style="display:flex;gap:4px"><button class="menu-btn" onclick="openPrint()" aria-label="Simpan atau cetak PDF">🖨️</button><button class="menu-btn" onclick="openTOC()" aria-label="Daftar isi">☰</button></div>
-    </div>
-    <div class="progress-container"><div class="progress-fill" id="progress-fill"></div></div>
+    <form id="login-form">
+      <label for="code">Kode akses</label>
+      <input
+        id="code"
+        name="code"
+        type="text"
+        placeholder="Contoh: EBK-..."
+        autocomplete="off"
+        required
+        maxlength="100"
+      >
+      <button id="submit-button" type="submit">
+        Buka Ebook
+      </button>
+    </form>
 
-    <div class="container">
+    <p id="message" role="status" aria-live="polite"></p>
+    <p class="hint">Jangan bagikan kode aksesmu kepada orang lain.</p>
+  </main>
 
-        <!-- VIEW 0: COVER -->
-        <div id="view-0" class="view-section active">
-            <div class="chapter-header" style="margin-top: 40px;">
-                <img src="https://www.englishcafe.co.id/wp-content/uploads/2014/09/1-title-664ae5bac5196.webp" alt="Cover" class="hero-img" style="aspect-ratio: 4/3;" loading="lazy">
-                <h1 class="chapter-title" style="font-size: 32px;">Jawabanmu Sudah Benar.<br>Lalu, Kenapa Interview-mu Tetap Gagal?</h1>
-                <p style="font-size: 16px; color: var(--text-muted); margin-bottom: 32px;">Dekode pola pikir penilai. Ditulis berdasarkan 30+ tahun pengalaman merancang Assessment Center dan melatih para interviewer / Recruiter.</p>
-                <p style="font-size:15px;color:var(--text-main);margin-bottom:8px"><strong>Buku ini tidak menjanjikan kamu lolos.</strong> Ia menunjukkan apa yang dicatat di seberang meja, supaya kamu berhenti menebak.</p>
-                <button class="btn-start" onclick="showView(1)">Mulai Baca →</button>
-                <p style="margin-top:16px"><button type="button" onclick="openPrint()" style="background:none;border:none;color:var(--text-muted);font-size:14px;text-decoration:underline;cursor:pointer;font-family:inherit;min-height:44px">🖨️ Lebih suka offline? Simpan sebagai PDF</button></p>
-            </div>
-        </div>
+  <script>
+    // Ganti kedua nilai ini dengan informasi proyek Supabase kamu.
+    const SUPABASE_URL = "https://ffyruatfbeuleycaokbj.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_Z1GQBWvh-x2JlxiLTfjJdQ_M8gv4jLM";
 
-        <!-- VIEW 1: SAPAAN NIKOLAS MADE -->
-        <div id="view-1" class="view-section">
-            <div class="author-container">
-                <div class="chapter-label">Sapaan Pembuka</div>
-                <h2 class="chapter-title">Dari Meja Senior Assessor</h2>
-                <div class="author-photo-placeholder">NM</div>
-                <div class="author-quote">
-                    "Saya tidak akan menjanjikan kamu lolos setelah membaca ini. Itu janji kosong. Tapi kamu akan tahu persis apa yang dinilai di seberang meja."
-                </div>
-                <!-- [ISI: ganti lingkaran "NM" di atas dengan FOTO ASLI; tambahkan 2-3 kredensial yang bisa dicek (sertifikasi, jam asesmen, jenis klien)] -->
-                <div class="author-bio">
-                    <p>Perkenalkan, saya <strong>Nikolas Made</strong>. Lulusan Psikologi UNAIR dengan fondasi metodologi Assessment Center dari standar perusahaan nasional.</p>
-                    <p>Selama lebih dari 30 tahun, saya tidak hanya menyeleksi ribuan kandidat. Saya merancang sistem penilaian dan melatih para asesor di puluhan workshop in-house untuk perusahaan multinasional dan BUMN tier-1.</p>
-                    <p>Saya tahu persis apa yang dicatat, dipertanyakan, dan menjadi penentu di balik pintu tertutup ruang interview — karena saya yang sering melatih mereka.</p>
-                    <p>Ebook ini bukan teori internet. Ini adalah distilasi dari ribuan sesi Interview nyata di dua sisi meja. Mari kita mulai.</p>
-                </div>
-            </div>
-        </div>
+    const form = document.getElementById("login-form");
+    const codeInput = document.getElementById("code");
+    const button = document.getElementById("submit-button");
+    const message = document.getElementById("message");
 
-        <!-- VIEW 2: BAB 1 - 8 DIMENSI KRITIS -->
-        <div id="view-2" class="view-section">
-            <header class="chapter-header">
-                <div class="chapter-label">Bab 2</div>
-                <h1 class="chapter-title">8 Hal yang Sebenarnya Kami Nilai</h1>
-                <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80" alt="Assessment Room" class="hero-img" loading="lazy">
-            </header>
-            <section>
-                <p>Banyak kandidat datang dengan menghafal jawaban. Tapi di lembar penilaian kami, tidak ada kotak untuk "Jawaban Hafalan".</p>
-                <p>Kami tidak menilai <em>apa</em> yang kamu katakan. Kami menilai <span class="highlight">pola di balik caramu menjawab</span>. Berikut adalah 8 dimensi kritis yang sebenarnya kami cari, diterjemahkan ke dalam bahasa yang jujur.</p>
-            </section>
-            <section style="margin-top: 32px;">
-                <h2 style="font-size: 18px; margin-bottom: 20px;">📋 Buka Catatan Assessor</h2>
-                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Ketuk tiap dimensi untuk membaca catatan assessor. Tanda centang berarti: menurutmu itu sudah terlihat dari caramu menjawab selama ini.</p>
-                <div class="checklist-item" onclick="toggleChecklist(this)"><div class="checklist-header"><div class="checklist-icon"></div><span>1. Stabil di Bawah Tekanan</span></div><div class="assessor-note">💭 Catatan Assessor: "Kandidat ini tidak mengambil feedback secara pribadi. Emosinya stabil saat saya tekan. Aman untuk lingkungan tekanan tinggi."</div></div>
-                <div class="checklist-item" onclick="toggleChecklist(this)"><div class="checklist-header"><div class="checklist-icon"></div><span>2. Konsisten & Otentik</span></div><div class="assessor-note">💭 Catatan Assessor: "Jawabannya konsisten dari awal sampai akhir. Tidak ada topeng. Ini orang yang otentik, bukan aktor."</div></div>
-                <div class="checklist-item" onclick="toggleChecklist(this)"><div class="checklist-header"><div class="checklist-icon"></div><span>3. Berorientasi Kolaborasi</span></div><div class="assessor-note">💭 Catatan Assessor: "Dia menyebut 'kami' lebih sering daripada 'saya'. Dia tahu kapan harus memimpin, kapan harus mendukung. Sinyal kolaborasi kuat."</div></div>
-                <div class="checklist-item" onclick="toggleChecklist(this)"><div class="checklist-header"><div class="checklist-icon"></div><span>4. Tangguh & Berdaya Juang</span></div><div class="assessor-note">💭 Catatan Assessor: "Saat cerita tentang kegagalan, dia tidak menyalahkan keadaan. Dia fokus pada apa yang dia usahakan untuk bangkit. Daya juang tinggi."</div></div>
-                <div class="checklist-item" onclick="toggleChecklist(this)"><div class="checklist-header"><div class="checklist-icon"></div><span>5. Kesadaran Diri & Rendah Hati</span></div><div class="assessor-note">💭 Catatan Assessor: "Dia berani bilang 'saya belum tahu, tapi saya akan cari tahu'. Kesadaran diri yang baik. Tidak sok tahu."</div></div>
-                <div class="checklist-item" onclick="toggleChecklist(this)"><div class="checklist-header"><div class="checklist-icon"></div><span>6. Adaptif terhadap Perubahan</span></div><div class="assessor-note">💭 Catatan Assessor: "Ketika saya ubah skenario di tengah cerita, dia tidak panik. Dia langsung beradaptasi. Toleransi ambiguitas bagus."</div></div>
-                <div class="checklist-item" onclick="toggleChecklist(this)"><div class="checklist-header"><div class="checklist-icon"></div><span>7. Solutif & Resourceful</span></div><div class="assessor-note">💭 Catatan Assessor: "Resourcefulness-nya tinggi. Saat tidak ada tools, dia cari cara lain. Bukan tipe yang diam menunggu instruksi."</div></div>
-                <div class="checklist-item" onclick="toggleChecklist(this)"><div class="checklist-header"><div class="checklist-icon"></div><span>8. Tangkas Belajar (Learning Agility)</span></div><div class="assessor-note">💭 Catatan Assessor: "Learning agility-nya tajam. Dia bisa unlearn cara lama yang tidak efektif dan cepat menguasai hal baru secara otodidak."</div></div>
-            <div id="chk-result" class="card" style="display:none"><p style="margin:0;font-size:15px"><strong>Kamu menandai <span id="chk-n">0</span> dari 8 dimensi sebagai sudah terlihat.</strong> Tapi yang menentukan adalah apa yang tertulis di kertas assessor, bukan niatmu. Selisih itu yang dilatih di Bab 5 sampai 7.</p></div>
-            </section>
-        </div>
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-        <!-- VIEW 3: BAB 2 - 6 RED FLAG -->
-        <div id="view-3" class="view-section">
-            <header class="chapter-header">
-                <div class="chapter-label">Bab 1</div>
-                <h1 class="chapter-title">6 Red Flag Tak Disadari</h1>
-                <img src="https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=800&q=80" alt="Red Flags" class="hero-img" loading="lazy">
-            </header>
-            <section>
-                <p>Ini adalah 6 pola yang bikin kamu dicoret <span class="highlight">diam-diam</span>. Kamu mungkin merasa jawabanmu sudah benar, tapi di lembar penilaian kami, ada catatan yang berbeda.</p>
-                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Klik setiap Red Flag untuk melihat kontras antara apa yang kamu pikirkan vs apa yang assessor tulis di kertas.</p>
-            </section>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>🤖 1. Efek Robot</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><em>Dimensi terkait (Bab 2): Konsisten & Otentik</em></p><p><strong>Apa yang terlihat:</strong> Jawaban terlalu rapi, tanpa jeda otentik. Terlalu lancar dari awal sampai akhir.</p><div class="redflag-label label-surface">Apa yang kamu pikirkan:</div><div class="redflag-box surface">"Saya sudah latihan keras. Jawaban saya sempurna. Saya siap."</div><div class="redflag-label label-assessor">💭 Catatan Assessor:</div><div class="redflag-box assessor">"Terlalu lancar. Curiga dihafal. Tidak ada tanda otentik. Jeda 1-2 detik itu tanda berpikir, bukan bodoh."</div></div></div>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>🦸 2. Sindrom "Saya yang Paling Berjasa"</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><em>Dimensi terkait (Bab 2): Berorientasi Kolaborasi</em></p><p><strong>Apa yang terlihat:</strong> Selalu jadi pusat cerita. "Saya yang inisiatif, saya yang perbaiki, saya yang selesaikan semuanya."</p><div class="redflag-label label-surface">Apa yang kamu pikirkan:</div><div class="redflag-box surface">"Saya mau tunjukkan ownership tinggi. Saya yang paling berkontribusi."</div><div class="redflag-label label-assessor">💭 Catatan Assessor:</div><div class="redflag-box assessor">"Tidak pernah menyebut tim. Solo hero. Sinyal kolaborasi lemah. Di perusahaan kecil, orang seperti ini jadi racun."</div></div></div>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>😤 3. Langsung Defensif Pas Ditekan</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><em>Dimensi terkait (Bab 2): Stabil di Bawah Tekanan</em></p><p><strong>Apa yang terlihat:</strong> Respons berubah drastis saat di-follow-up. Nada berubah, tubuh tegang, mulai menyalahkan.</p><div class="redflag-label label-surface">Apa yang kamu pikirkan:</div><div class="redflag-box surface">"Saya tetap tenang dan menjelaskan ulang dengan lebih detail."</div><div class="redflag-label label-assessor">💭 Catatan Assessor:</div><div class="redflag-box assessor">"Composure rendah. Saat ditekan sedikit, langsung defensif. Ini prediktor utama ketahanan kerja."</div></div></div>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>😞 4. Mentalitas Korban</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><em>Dimensi terkait (Bab 2): Tangguh & Berdaya Juang</em></p><p><strong>Apa yang terlihat:</strong> Menyalahkan eksternal: dosen, rekan tim, waktu yang mepet, kondisi pasar.</p><div class="redflag-label label-surface">Apa yang kamu pikirkan:</div><div class="redflag-box surface">"Memang situasinya tidak mendukung. Tim saya yang tidak kerja."</div><div class="redflag-label label-assessor">💭 Catatan Assessor:</div><div class="redflag-box assessor">"Tidak ada ownership. External locus of control. Di perusahaan kecil, tidak ada tempat berlindung di balik birokrasi."</div></div></div>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>📚 5. Jago Teori, Nol Eksekusi</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><em>Dimensi terkait (Bab 2): Solutif & Resourceful</em></p><p><strong>Apa yang terlihat:</strong> Penuh buzzword, bingung saat ditanya langkah konkret. "Saya akan lakukan analisis SWOT, buat blue ocean strategy."</p><div class="redflag-label label-surface">Apa yang kamu pikirkan:</div><div class="redflag-box surface">"Saya mau tunjukkan saya paham konsep-konsep canggih."</div><div class="redflag-label label-assessor">💭 Catatan Assessor:</div><div class="redflag-box assessor">"Ketinggian. Tidak bisa turun ke lapangan. Perusahaan menengah butuh doer, bukan thinker di menara gading."</div></div></div>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>📋 6. Panik Kalau Gak Ada SOP</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><em>Dimensi terkait (Bab 2): Adaptif terhadap Perubahan</em></p><p><strong>Apa yang terlihat:</strong> Kekakuan prosedural. Lumpuh saat aturan tidak jelas atau SOP belum ada.</p><div class="redflag-label label-surface">Apa yang kamu pikirkan:</div><div class="redflag-box surface">"Saya ikuti prosedur yang ada. Saya disiplin."</div><div class="redflag-label label-assessor">💭 Catatan Assessor:</div><div class="redflag-box assessor">"Lumpuh tanpa instruksi. Tidak cocok untuk lingkungan dinamis. Akan burnout atau mengeluh terus-menerus."</div></div></div><div class="mini-cta"><p>Kamu sudah tahu daftarnya. Tapi pola-pola ini hampir tidak terlihat dari dalam diri sendiri. Di Simulasi Interview HR, Bab 1 ini saya bahas lewat video, lalu kamu berlatih mengenalinya di jawabanmu sendiri.</p><a class="btn-cta t1-link" href="#">Lihat Simulasi Interview HR (Rp 99.000) →</a><p style="font-size:13px;margin:12px 0 0">Opsional. Buku ini utuh tanpa itu.</p></div>
-        </div>
+      const code = codeInput.value.trim();
+      if (!code) return;
 
-        <!-- VIEW 4: BAB 3 - CULTURE FIT -->
-        <div id="view-4" class="view-section">
-            <header class="chapter-header">
-                <div class="chapter-label">Bab 3</div>
-                <h1 class="chapter-title">Culture Fit: BUMN vs Startup vs SME</h1>
-                <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=800&q=80" alt="Culture Fit" class="hero-img" loading="lazy">
-            </header>
-            <section>
-                <p>Jawaban yang <span class="highlight">sama persis</span> bisa "pass" di startup, tapi "fail" di BUMN. Bukan karena kepribadianmu salah, tapi karena kamu tidak menyesuaikan penekanan jawaban dengan konteks perusahaan.</p>
-                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">Pilih jenis perusahaan yang kamu lamar untuk melihat trait apa yang paling dicari. Ini pola umum dari pengalaman saya, bukan aturan baku: tiap perusahaan punya budayanya sendiri.</p>
-            </section>
-            <div class="toggle-container">
-                <button class="toggle-btn active" onclick="toggleCulture('bumn', this)">BUMN</button>
-                <button class="toggle-btn" onclick="toggleCulture('startup', this)">Startup</button>
-                <button class="toggle-btn" onclick="toggleCulture('sme', this)">SME</button>
-            </div>
-            <div id="bumn-content" class="toggle-content active">
-                <h2 style="font-size: 18px; margin-bottom: 16px;">🏢 BUMN: Kepatuhan & Stabilitas</h2>
-                <div class="trait-item"><div class="trait-title">✓ Menghormati Hierarki</div><div class="trait-desc">Tunjukkan kamu paham struktur dan tahu kapan harus escalate ke atasan. Tidak "rebel" tanpa alasan jelas.</div></div>
-                <div class="trait-item"><div class="trait-title">✓ Sabar dengan Proses</div><div class="trait-desc">Birokrasi itu nyata. Tunjukkan kamu bisa bekerja dalam sistem yang lambat tanpa kehilangan motivasi.</div></div>
-                <div class="trait-item"><div class="trait-title">✓ Stabil & Konsisten</div><div class="trait-desc">Perubahan tidak terjadi cepat. Tunjukkan kamu tidak mudah bosan dan bisa fokus pada rutinitas.</div></div>
-                <div class="trait-item"><div class="trait-title">✓ Kenali Nilai Inti Perusahaan</div><div class="trait-desc">Banyak BUMN merumuskan nilai inti bersama, misalnya AKHLAK (Amanah, Kompeten, Harmonis, Loyal, Adaptif, Kolaboratif). Cek nilai perusahaan yang kamu lamar dan siapkan satu cerita nyata untuk dua atau tiga nilai itu.</div></div>
-                <div class="trait-item" style="background: rgba(181, 101, 74, 0.05); border-color: var(--accent-terracotta);"><div class="trait-title" style="color: var(--accent-terracotta);">⚠️ Red Flag di BUMN</div><div class="trait-desc">Terlalu "rebel", tidak sabar dengan proses, ingin cepat berubah tanpa memahami sistem.</div></div>
-            </div>
-            <div id="startup-content" class="toggle-content">
-                <h2 style="font-size: 18px; margin-bottom: 16px;">🚀 Startup: Ambiguitas & Kecepatan</h2>
-                <div class="trait-item"><div class="trait-title">✓ Toleran terhadap Ambiguitas</div><div class="trait-desc">Job desk berubah, prioritas bergeser. Tunjukkan kamu tidak lumpuh saat tidak ada instruksi jelas.</div></div>
-                <div class="trait-item"><div class="trait-title">✓ Proaktif & Inisiatif</div><div class="trait-desc">Menunggu diperintah = musuh. Tunjukkan kamu melihat masalah, lalu datang membawa solusi.</div></div>
-                <div class="trait-item"><div class="trait-title">✓ Cepat Beradaptasi</div><div class="trait-desc">Teknologi dan pasar berubah cepat. Tunjukkan kamu bisa unlearn dan relearn dengan cepat.</div></div>
-                <div class="trait-item" style="background: rgba(181, 101, 74, 0.05); border-color: var(--accent-terracotta);"><div class="trait-title" style="color: var(--accent-terracotta);">⚠️ Red Flag di Startup</div><div class="trait-desc">Butuh instruksi detail, kaku, lambat beradaptasi, tidak nyaman dengan ketidakpastian.</div></div>
-            </div>
-            <div id="sme-content" class="toggle-content">
-                <h2 style="font-size: 18px; margin-bottom: 16px;">🏭 SME: Pragmatis & Hands-on</h2>
-                <div class="trait-item"><div class="trait-title">✓ Resourceful</div><div class="trait-desc">Sumber daya terbatas. Tunjukkan kamu bisa memutar otak, bukan selalu minta tools baru atau tambahan orang.</div></div>
-                <div class="trait-item"><div class="trait-title">✓ Hands-on & Multitasking</div><div class="trait-desc">Siap kerja "kotor" (turun ke lapangan). Tidak terlalu spesialis, bisa pegang beberapa peran sekaligus.</div></div>
-                <div class="trait-item"><div class="trait-title">✓ Efisien & Pragmatis</div><div class="trait-desc">"Done is better than perfect, as long as it's accurate." Tidak perfeksionis yang membuat pekerjaan terlambat.</div></div>
-                <div class="trait-item" style="background: rgba(181, 101, 74, 0.05); border-color: var(--accent-terracotta);"><div class="trait-title" style="color: var(--accent-terracotta);">⚠️ Red Flag di SME</div><div class="trait-desc">Terlalu spesialis, butuh tools mahal, tidak mau kerja di luar job desc, perfeksionis yang lambat.</div></div>
-            </div>
-        </div>
+      button.disabled = true;
+      message.textContent = "Memeriksa kode akses...";
 
-        <!-- VIEW 5: BAB 4 - KERANGKA JEBAKAN -->
-        <div id="view-5" class="view-section">
-            <header class="chapter-header">
-                <div class="chapter-label">Bab 5</div>
-                <h1 class="chapter-title">Kerangka Menjawab "Jebakan"</h1>
-                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" alt="Framework" class="hero-img" loading="lazy">
-            </header>
-            <section>
-                <p>Jujur saja: kerangka ini berkerabat dengan STAR, dan STAR tidak salah. Yang sering salah adalah isinya, terutama bagian "tindakan" yang berubah jadi pembelaan diri. Untuk pertanyaan jebakan seperti <em>"Ceritakan kegagalan terbesarmu"</em>, assessor mencari <span class="highlight">Kesadaran Diri</span>, bukan kesempurnaan.</p>
-                <p>Gunakan kerangka 3 bagian ini untuk menjawab dengan otentik:</p>
-            </section>
-            <section style="margin-top: 24px;">
-                <div class="framework-step">
-                    <h3>1. Situasi Spesifik</h3>
-                    <p>Ceritakan konteks nyata, singkat, dan jelas. Bukan cerita umum yang bisa terjadi pada siapa saja.</p>
-                </div>
-                <div class="framework-step">
-                    <h3>2. Apa yang dalam Kendalimu (Pengakuan)</h3>
-                    <p>Ini bagian terpenting. Akui tanggung jawabmu atas kegagalan tersebut. Jangan menyalahkan tim atau keadaan. Tunjukkan kamu punya ownership.</p>
-                </div>
-                <div class="framework-step">
-                    <h3>3. Apa yang Berubah (Bukti)</h3>
-                    <p>Jangan hanya bilang "saya belajar". Tunjukkan bukti konkret: sistem yang kamu buat, kebiasaan baru yang kamu terapkan, atau hasil yang berbeda di proyek berikutnya.</p>
-                </div>
-            </section>
-            <section style="margin-top: 32px;">
-                <h2 style="font-size: 18px; margin-bottom: 16px;">Perbandingan Jawaban</h2>
-                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Lihat perbedaan mencolok antara jawaban yang dihafal vs jawaban otentik.</p>
-                <div class="comparison-box">
-                    <div class="comparison-title">Pertanyaan: "Ceritakan kegagalanmu."</div>
-                    <div class="comparison-item">
-                        <div class="comparison-label label-robot">❌ Jawaban Robot (Dihafal)</div>
-                        <div class="comparison-text">"Kegagalan terbesar saya adalah saya terlalu perfeksionis sehingga pekerjaan sering terlambat. Tapi saya sudah belajar untuk mengatur waktu dengan lebih baik."</div>
-                    </div>
-                    <div class="comparison-item authentic">
-                        <div class="comparison-label label-authentic">✅ Jawaban Otentik (Anti-Robot)</div>
-                        <div class="comparison-text">"Saat jadi ketua panitia acara kampus, saya gagal mendelegasikan tugas karena ingin semua sempurna. Akibatnya, saya burnout dan 2 divisi terlambat bekerja. Saya sadar itu kesalahan manajemen saya. Di proyek berikutnya, saya buat sistem check-in harian dan delegasi berdasarkan kekuatan anggota. Acara berjalan lancar tanpa saya harus lembur."</div>
-                        <div class="assessor-note visible" style="margin-top:8px">💭 Catatan Assessor: "Mengakui kesalahan dalam satu kalimat. Tidak membela diri. Ada bukti perubahan yang bisa dicek. Catatan: versi ini sengaja rapi; di ruangan, ceritamu boleh lebih berantakan asal jujur."</div>
-                    </div>
-                </div>
-            </section>
-            <section style="margin-top: 24px;">
-                <div class="comparison-box">
-                    <div class="comparison-title">Contoh kedua: "Ceritakan pengalamanmu menghadapi konflik di tim."</div>
-                    <div class="comparison-item"><div class="comparison-label label-robot">❌ Jawaban Robot</div><div class="comparison-text">"Saya selalu mengutamakan komunikasi yang baik, jadi konflik bisa diselesaikan dengan musyawarah."</div></div>
-                    <div class="comparison-item authentic"><div class="comparison-label label-authentic">✅ Jawaban Otentik</div><div class="comparison-text">"Di tugas kelompok semester 5, satu anggota tidak mengerjakan bagiannya dan saya diam dua minggu karena tidak enak. Itu kesalahan saya: harusnya bicara lebih awal. Akhirnya saya ajak dia bicara berdua. Ternyata dia kewalahan karena kerja paruh waktu. Bagiannya kami bagi ulang. Sejak itu, di kerja kelompok saya sepakati pembagian tugas tertulis di minggu pertama."</div>
-                    <div class="assessor-note visible" style="margin-top:8px">💭 Catatan Assessor: "Situasinya biasa, tapi spesifik dan jujur. Tidak ada drama. Ada perubahan perilaku."</div></div>
-                </div>
-                <h2 style="font-size:18px">Tidak punya cerita organisasi?</h2>
-                <p style="font-size:15px">Cerita yang baik tidak harus besar. Cari satu momen saat sesuatu tidak berjalan sesuai rencana dan kamu punya andil. Tempat menggalinya:</p>
-                <div class="trait-item"><div class="trait-desc">• Tugas kelompok atau skripsi<br>• Kerja paruh waktu, freelance, atau bantu usaha keluarga<br>• Kepanitiaan kecil, komunitas, atau kegiatan online<br>• Mengurus sesuatu di rumah yang menuntut tanggung jawab</div></div>
-                <h2 style="font-size:18px">Dua pertanyaan klasik</h2>
-                <div class="trait-item"><div class="trait-title">"Ceritakan tentang dirimu."</div><div class="trait-desc">Tiga kalimat cukup: siapa kamu sekarang (fokus, bukan riwayat hidup), satu bukti singkat, dan kenapa posisi ini masuk akal untukmu.</div></div>
-                <div class="trait-item"><div class="trait-title">"Kenapa kami harus merekrut kamu?"</div><div class="trait-desc">Sebut satu kecocokan spesifik dengan kebutuhan posisi, plus satu batas yang jujur. Bukan daftar sifat baik.</div></div>
-            </section>
-        </div>
+      try {
+        const verifyResponse = await fetch(
+          `${SUPABASE_URL}/functions/v1/verify-ebook-code`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": SUPABASE_ANON_KEY,
+              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({ code })
+          }
+        );
 
-        <!-- VIEW 6: BAB 5 - FOLLOW-UP SIMULATOR -->
-        <div id="view-6" class="view-section">
-            <header class="chapter-header">
-                <div class="chapter-label">Bab 6</div>
-                <h1 class="chapter-title">Bertahan di Sesi Follow-up</h1>
-                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" alt="Pressure" class="hero-img" loading="lazy">
-            </header>
-            <section>
-                <p>Di sinilah, dalam pengalaman saya, paling banyak kandidat terpeleset. Assessor sengaja menekan untuk melihat <em>composure</em> (ketenangan) kamu. Jangan panik. Gunakan 3 Langkah Sederhana ini:</p>
-            </section>
-            <section style="margin-top: 24px;">
-                <div class="framework-step"><h3>1. Jeda (Pause)</h3><p>Jangan langsung menjawab. Ambil jeda 1-3 detik. Tarik napas. Ini menunjukkan kamu BERPIKIR, bukan bereaksi emosional.</p></div>
-                <div class="framework-step"><h3>2. Akui (Acknowledge)</h3><p>Akui bagian yang memang benar dari kekhawatiran mereka, dengan kata-katamu sendiri. Tidak perlu kalimat pembuka baku; kalimat baku justru terdengar dihafal.</p></div>
-                <div class="framework-step"><h3>3. Alihkan ke Solusi (Reframe)</h3><p>Buktikan kamu solutif. "Namun, jika saya berada di situasi itu, langkah pertama yang akan saya ambil adalah..."</p></div>
-            </section>
-            <section class="simulator-box"><div class="simulator-title">Latihan Singkat: 3 Pertanyaan Follow-up</div><div id="sim-root"></div></section>
-        </div>
+        const result = await verifyResponse.json();
 
-        <!-- VIEW 7: BAB 6 - ZONA PRAKTIK -->
-        <div id="view-7" class="view-section">
-            <header class="chapter-header">
-                <div class="chapter-label">Bab 7</div>
-                <h1 class="chapter-title">Zona Praktik: Racik Cerita Otentik</h1>
-                <img src="https://awsimages.detik.net.id/community/media/visual/2025/06/02/ilustrasi-wawancara-kerja-1748854413288_169.jpeg?w=1200" alt="Practice" class="hero-img" loading="lazy">
-            </header>
-            <section>
-                <p>Teori saja tidak akan mengubah cara kamu bicara. Saatnya kamu meracik jawabanmu sendiri menggunakan kerangka Bab 5.</p>
-                <p class="highlight" style="display:inline-block; margin-bottom: 24px;">🔒 Catatan: Tulisanmu otomatis tersimpan di perangkat ini. Aman dan privat! Tiap pertanyaan disimpan terpisah.</p>
-            </section>
-            <div id="saved-ind" class="saved-ind"></div>
-            <div class="worksheet-section">
-                <div class="input-group"><label class="form-label">Pilih Pertanyaan Interview</label><div id="q-chips" class="q-chips"></div></div>
-                <div id="q-guide" class="q-guide"></div>
-                <div class="input-group" id="custom-q-group" style="display:none"><label class="form-label">Tulis pertanyaanmu sendiri</label><input type="text" id="ws_pertanyaan" class="form-input" placeholder="Tulis pertanyaannya di sini..."></div>
-                <div class="input-group"><label class="form-label">1. Situasi Spesifik</label><textarea id="ws_situasi" class="form-textarea"></textarea></div>
-                <div class="input-group"><label class="form-label">2. Apa yang dalam Kendalimu (Pengakuan)</label><textarea id="ws_kendali" class="form-textarea"></textarea></div>
-                <div class="input-group"><label class="form-label">3. Apa yang Berubah (Bukti)</label><textarea id="ws_berubah" class="form-textarea"></textarea></div>
-                <div class="input-group"><label class="form-label">4. Insight Singkat (opsional)</label><textarea id="ws_insight" class="form-textarea"></textarea></div>
-                <button class="btn-action btn-primary" onclick="generatePreview()">✨ Lihat Preview Jawaban</button>
-                <button class="btn-action btn-secondary" id="btn-clear" onclick="clearForm()">Hapus Pertanyaan Ini</button>
-                <div id="preview-card" class="preview-card">
-                    <div class="preview-title">📝 Script Jawabanmu:</div>
-                    <div id="preview-text" class="preview-text"></div>
-                    <div class="mini-cta"><p>Preview ini hanya merangkai tulisanmu. Catatan dari sisi assessor atas jawabanmu, termasuk nada dan caramu bereaksi saat ditekan, dibahas lebih dalam di Simulasi Interview HR.</p><a class="btn-cta t1-link" href="#">Lihat Simulasi Interview HR (Rp 99.000) →</a><p style="font-size:13px;margin:12px 0 0">Opsional. Buku ini utuh tanpa itu.</p></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW 9: PETA SELEKSI -->
-        <div id="view-9" class="view-section">
-            <header class="chapter-header"><div class="chapter-label">Bab 4</div><h1 class="chapter-title">Peta Seleksi: Di Tahap Mana Kamu Biasanya Gugur</h1><img src="https://asset.kompas.com/crops/34XQquU-b2LPbeQ_Ren7rXTAdBw=/0x0:1000x667/1200x800/data/photo/2018/01/08/2863071610.jpg" alt="Orang menunduk memegangi kepala karena stres" class="hero-img" loading="lazy"></header>
-            <section><p>Urutan seleksi berbeda di tiap perusahaan. Ini pola umum dari pengalaman saya, bukan aturan baku. Buka tiap tahap untuk melihat apa yang dinilai dan di mana kandidat biasanya terpeleset.</p></section>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>1. Psikotes</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><strong>Dinilai:</strong> kemampuan berpikir, ketelitian, dan konsistensi jawaban pada tes kepribadian.</p><p><strong>Biasanya terpeleset:</strong> menebak "jawaban ideal" sehingga jawaban saling bertentangan, atau kehabisan waktu.</p><p><strong>Yang bisa kamu lakukan:</strong> jawab jujur dan konsisten, dan latih manajemen waktu. Buku ini tidak melatih soal psikotes.</p></div></div>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>2. Diskusi Kelompok (LGD)</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><strong>Dinilai:</strong> cara berkontribusi, mendengar, dan menengahi. Bukan siapa paling banyak bicara.</p><p><strong>Biasanya terpeleset:</strong> mendominasi, atau diam sepanjang diskusi.</p><p><strong>Yang bisa kamu lakukan:</strong> beri satu kontribusi substantif di awal, lalu rangkum atau ajukan pertanyaan saat diskusi buntu.</p></div></div>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>3. Wawancara HR</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><strong>Dinilai:</strong> konsistensi cerita, kesadaran diri, dan kecocokan nilai.</p><p><strong>Biasanya terpeleset:</strong> jawaban hafalan dan defensif saat ditekan (Bab 1).</p><p><strong>Yang bisa kamu lakukan:</strong> Bab 5 sampai 7.</p></div></div>
-            <div class="redflag-item"><div class="redflag-header" onclick="toggleRedflag(this)"><span>4. Wawancara User / Atasan</span><span class="redflag-icon">▼</span></div><div class="redflag-content"><p><strong>Dinilai:</strong> kemampuan kerja yang konkret.</p><p><strong>Biasanya terpeleset:</strong> jargon tanpa langkah nyata.</p><p><strong>Yang bisa kamu lakukan:</strong> sebut langkah pertama yang akan kamu ambil, bukan nama konsepnya.</p></div></div>
-            <p style="font-size:15px;color:var(--text-muted)">Buku ini paling dalam membahas tahap 3 dan 4.</p>
-        </div>
-
-        <!-- VIEW 8: PENUTUP & CTA T-1 -->
-        <div id="view-8" class="view-section">
-            <header class="chapter-header">
-                <div class="chapter-label">Penutup</div>
-                <h1 class="chapter-title">Peta Sudah di Tanganmu</h1>
-                <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80" alt="Closing" class="hero-img" loading="lazy">
-            </header>
-            <div class="closing-message">
-                <div class="closing-emoji">🧭</div>
-                <h2 style="font-size: 20px; margin-bottom: 16px;">Perubahan Tidak Datang dari Satu Kali Baca</h2>
-                <p style="font-size: 16px; color: var(--text-main); line-height: 1.6;">Membaca ini bukan jaminan lolos. Tapi kamu sekarang tahu apa yang dicari assessor, dan punya cara memeriksa jawabanmu sendiri. Tebak-tebakannya berkurang. Sisanya soal latihan.</p>
-            </div>
-            <div class="cta-box">
-                <div class="cta-title">Dari Membaca ke Berlatih: Simulasi Interview HR</div>
-                <div class="cta-desc">Buku ini menunjukkan apa yang dicari assessor. Simulasi Interview HR adalah langkah berikutnya: kamu menerapkannya, lalu membedah jawabanmu sendiri.</div>
-                <div style="text-align:left;font-size:15px;line-height:1.6;margin-bottom:20px">
-                    <p style="margin:0 0 10px"><strong>🎬 Video: 6 Red Flag Tak Disadari.</strong> Bab 1 saya bahas langsung, dengan contoh yang tidak muat di buku.</p>
-                    <p style="margin:0 0 10px"><strong>🎯 Simulasi interaktif.</strong> Kamu menjawab dalam situasi yang menyerupai ruang asesmen, bukan sekadar membaca contoh.</p>
-                    <p style="margin:0"><strong>🧩 Pembedahan jawaban.</strong> Kamu melihat jawabanmu dari sudut pandang assessor, beserta langkah perbaikannya.</p>
-                </div>
-                <div style="text-align:left;font-size:14px;line-height:1.6;background:#F3EFEA;border-radius:12px;padding:14px;margin-bottom:20px">
-                    <p style="margin:0 0 8px"><strong>Cocok jika</strong> kamu sudah beberapa kali interview dan ingin tahu apa yang sebenarnya terbaca dari jawabanmu.</p>
-                    <p style="margin:0"><strong>Belum perlu jika</strong> kamu belum mencoba Bab 7. Selesaikan itu dulu; tidak perlu bayar tambahan.</p>
-                </div>
-                <div style="font-size:26px;font-weight:800;margin-bottom:4px">Rp 99.000</div>
-                <p style="font-size:13px;color:var(--text-muted);margin:0 0 16px">Sekitar dua kali harga buku ini, karena isinya bukan lagi bacaan: ada video dan simulasi yang kamu kerjakan sendiri. Sekali bayar.</p>
-                <!-- [ISI: durasi total video + simulasi, jumlah skenario, bentuk feedback (otomatis/ditulis manusia), garansi/refund bila ada. Link: ubah T1_URL di script] -->
-                <a href="#" class="btn-cta t1-link">Ambil Simulasi Interview HR (Rp 99.000) →</a>
-                <p style="font-size: 13px; color: var(--text-muted); margin-top: 16px;">Ini tidak menjamin kamu lolos. Ini cara berlatih yang lebih jelas. Opsional: buku ini sudah utuh tanpanya.</p>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">*Akses instan via email setelah pembayaran.</p>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- BOTTOM NAV -->
-    <div class="bottom-nav">
-        <button id="btn-prev" class="nav-btn btn-prev" onclick="prevView()" disabled>← Sebelumnya</button>
-        <button id="btn-next" class="nav-btn btn-next" onclick="nextView()">Selanjutnya →</button>
-    </div>
-
-    <!-- TOC MODAL -->
-    <div id="toc-modal" class="toc-modal" onclick="closeTOC(event)">
-        <div class="toc-content" onclick="event.stopPropagation()">
-            <div class="toc-header">
-                <h3>Daftar Isi</h3>
-                <button class="close-btn" onclick="closeTOC()">✕</button>
-            </div>
-            <ul class="toc-list" id="toc-list"></ul>
-        </div>
-    </div>
-
-    <!-- PRINT MODAL -->
-    <div id="print-modal" class="toc-modal" onclick="closePrint(event)">
-        <div class="toc-content" onclick="event.stopPropagation()">
-            <div class="toc-header"><h3>Simpan / Cetak PDF</h3><button class="close-btn" onclick="closePrint()">✕</button></div>
-            <p style="font-size:14px;color:var(--text-muted);margin-bottom:14px">Untuk kamu yang ingin membaca offline. Pilih tata letak, lalu di layar cetak pilih <strong>Simpan sebagai PDF</strong>.</p>
-            <button type="button" class="q-chip" style="width:100%;border-radius:14px;text-align:left;margin-bottom:10px;padding:14px" onclick="printDoc('book')"><strong>📖 Versi Buku (B5)</strong><br><span style="font-size:13px;font-weight:400;color:var(--text-muted)">Satu bab per halaman, nyaman dibaca seperti buku.</span></button>
-            <button type="button" class="q-chip" style="width:100%;border-radius:14px;text-align:left;margin-bottom:14px;padding:14px" onclick="printDoc('work')"><strong>📝 Versi Workbook (A4)</strong><br><span style="font-size:13px;font-weight:400;color:var(--text-muted)">Lebih padat dan hemat kertas, lembar latihan lebih luas untuk ditulis tangan.</span></button>
-            <p style="font-size:13px;color:var(--text-muted);margin:0">Di PDF, bagian interaktif (simulator, preview) menjadi versi statis, dan lembar latihan Bab 7 menjadi lembar tulis. Kalau layar cetak tidak muncul, buka halaman ini di Chrome atau Safari.</p>
-        </div>
-    </div>
-
-    <script>
-        const T1_URL = 'https://terasfounder.myr.id/pl/ksa-ruang-asesmen'; // GANTI: satu-satunya tempat link T-1
-        const ORDER=[0,1,3,2,4,9,5,6,7,8];
-        const TITLES={0:'Cover',1:'Sapaan Pembuka',3:'Bab 1: 6 Red Flag',2:'Bab 2: 8 Dimensi',4:'Bab 3: Culture Fit',9:'Bab 4: Peta Seleksi',5:'Bab 5: Kerangka Jawaban',6:'Bab 6: Follow-up',7:'Bab 7: Zona Praktik',8:'Penutup'};
-        const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
-        let pos=0; let visited=new Set(); try{visited=new Set(JSON.parse(store.get('ksa_visited')||'[]'))}catch(e){}
-
-        function showView(id){
-            const p=ORDER.indexOf(id); if(p<0) return; pos=p;
-            document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active'));
-            document.getElementById('view-'+id).classList.add('active');
-            document.getElementById('progress-fill').style.width=(p/(ORDER.length-1)*100)+'%';
-            document.getElementById('btn-prev').disabled=(p===0);
-            const nb=document.getElementById('btn-next'); const last=(p===ORDER.length-1);
-            nb.disabled=last; nb.innerText=last?'Selesai':'Selanjutnya →';
-            visited.add(id); store.set('ksa_visited',JSON.stringify([...visited])); store.set('ksa_pos',p);
-            window.scrollTo({top:0,behavior:'smooth'});
-        }
-        function nextView(){ if(pos<ORDER.length-1) showView(ORDER[pos+1]); }
-        function prevView(){ if(pos>0) showView(ORDER[pos-1]); }
-        function openTOC(){
-            document.getElementById('toc-list').innerHTML=ORDER.map(id=>`<li class="toc-item" onclick="showView(${id});closeTOC();"><span>${TITLES[id]}</span><span>${visited.has(id)&&id!==ORDER[pos]?'✓':''}</span></li>`).join('');
-            document.getElementById('toc-modal').classList.add('active');
-        }
-        function closeTOC(e){ if(!e||e.target.id==='toc-modal'||e.target.classList.contains('close-btn')) document.getElementById('toc-modal').classList.remove('active'); }
-
-        function toggleChecklist(el){
-            el.classList.toggle('checked'); el.querySelector('.assessor-note').classList.toggle('visible');
-            const n=document.querySelectorAll('#view-2 .checklist-item.checked').length;
-            document.getElementById('chk-n').textContent=n;
-            document.getElementById('chk-result').style.display=n?'block':'none';
-        }
-        function toggleRedflag(h){ const i=h.parentElement,a=i.classList.contains('active'); document.querySelectorAll('.redflag-item').forEach(x=>x.classList.remove('active')); if(!a) i.classList.add('active'); }
-        function toggleCulture(type,btn){
-            document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-            document.querySelectorAll('.toggle-content').forEach(c=>c.classList.remove('active'));
-            document.getElementById(type+'-content').classList.add('active');
+        if (!verifyResponse.ok || result.valid !== true ||
+            typeof result.session_token !== "string") {
+          throw new Error(
+            result.message || result.error || "Kode tidak valid."
+          );
         }
 
-        // --- SIMULATOR (3 soal, opsi diacak) ---
-        const SIM=[
-         {q:'"Jawabanmu bagus di atas kertas, tapi kamu belum punya pengalaman nyata. Bagaimana kamu menjamin bisa langsung bekerja di sini?"',o:[
-          ['Saya yakin bisa, Pak/Bu. Saya cepat belajar, dan nilai saya di kampus selalu A, jadi saya tidak akan merepotkan.',0,'Janji tanpa bukti. Assessor mencatat: klaim umum, tidak ada contoh.'],
-          ['Betul, pengalaman kerja saya memang belum ada. Yang bisa saya tunjukkan: saat tugas akhir, saya belajar Excel lanjutan sendiri dalam 3 hari dan hasilnya dipakai kelompok.',1,'Mengakui keterbatasan dengan kata sendiri, lalu memberi satu bukti spesifik. Tidak ada kalimat template.'],
-          ['Kalau soal itu, apakah perusahaan menyediakan pelatihan intensif di bulan pertama supaya saya bisa menyesuaikan diri?',0,'Pertanyaan wajar di waktu lain, tapi di sini kamu membalik pertanyaan sebelum menjawabnya. Dicatat: menghindar.']]},
-         {q:'"Alasanmu tadi terdengar seperti mencari pembenaran."',o:[
-          ['Bukan begitu, Pak/Bu. Saya sudah menjelaskan dengan jelas tadi, dan situasinya memang tidak mendukung.',0,'Defensif dan menyalahkan keadaan. Composure turun; ini yang paling sering dicatat.'],
-          ['Bisa jadi terdengar begitu. Bagian yang memang kesalahan saya: saya terlambat melapor. Sesudahnya saya ubah caranya, laporan progres tiap dua hari.',1,'Menerima kritik tanpa runtuh, memisahkan bagian yang di kendalimu, lalu memberi bukti perubahan.'],
-          ['Maaf, Pak/Bu, mungkin saya yang salah dalam segala hal. Saya akan berusaha lebih baik lagi ke depannya.',0,'Menyerah tanpa isi. Tidak ada bukti, dan terlihat goyah di bawah tekanan.']]},
-         {q:'"Atasanmu menitipkan tugas tanpa SOP dan sedang tidak bisa dihubungi. Apa yang kamu lakukan?"',o:[
-          ['Saya tunggu sampai beliau bisa dihubungi, supaya saya tidak salah langkah sedikit pun.',0,'Aman, tapi memberi sinyal lumpuh tanpa instruksi.'],
-          ['Saya kerjakan bagian berisiko kecil dulu, catat asumsi saya, lalu laporkan begitu beliau tersedia. Yang berisiko besar saya tahan.',1,'Bergerak dalam batas aman dan transparan soal asumsi. Ini sinyal toleransi ambiguitas.'],
-          ['Saya kerjakan semuanya sesuai pemahaman saya sendiri; nanti beliau pasti paham maksud saya.',0,'Berani, tapi tanpa batas risiko dan tanpa pelaporan.']]}];
-        let simI=0,simScore=0,simTried=false;
-        function renderSim(){
-            const r=document.getElementById('sim-root'),s=SIM[simI];
-            if(!s){ r.innerHTML=`<p><strong>Selesai.</strong> Kamu langsung benar di ${simScore} dari ${SIM.length} soal. Angkanya tidak penting. Polanya yang penting: jawaban kuat mengakui, memberi bukti, dan tidak memakai kalimat template.</p>`; return; }
-            const opts=s.o.map((x,i)=>[i,x]).sort(()=>Math.random()-.5);
-            r.innerHTML=`<p class="sim-n">Soal ${simI+1} dari ${SIM.length}</p><div class="hr-question">${s.q}</div><p style="font-size:15px;font-weight:600;margin-bottom:12px">Pilih responsmu:</p>`+opts.map(([i,x])=>`<button class="option-btn" data-i="${i}">${x[0]}</button>`).join('')+'<div id="sim-feedback" class="simulator-feedback"></div><button id="sim-next" class="btn-action btn-secondary" style="display:none;margin-top:12px"></button>';
-            simTried=false;
-            r.querySelectorAll('.option-btn').forEach(b=>b.onclick=()=>pickSim(b,s.o[b.dataset.i]));
-        }
-        function pickSim(b,x){
-            const f=document.getElementById('sim-feedback'); f.style.display='block';
-            f.className='simulator-feedback '+(x[1]?'show-correct':'show-wrong');
-            f.innerHTML='<strong>💭 Catatan Assessor:</strong> '+x[2]+(x[1]?'':' Coba pilihan lain.');
-            if(x[1]){
-                if(!simTried) simScore++;
-                b.classList.add('correct'); document.querySelectorAll('#sim-root .option-btn').forEach(o=>o.disabled=true);
-                const n=document.getElementById('sim-next'); n.style.display='block'; n.textContent=(simI===SIM.length-1)?'Lihat ringkasan →':'Soal berikutnya →'; n.onclick=()=>{simI++;renderSim();};
-            } else { simTried=true; b.classList.add('tried'); b.disabled=true; }
+        message.textContent = "Kode benar. Mengambil ebook...";
+
+        const contentResponse = await fetch(
+          `${SUPABASE_URL}/functions/v1/get-ebook-content`,
+          {
+            method: "GET",
+            headers: {
+              "apikey": SUPABASE_ANON_KEY,
+              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+              "x-ebook-session": result.session_token
+            },
+            cache: "no-store"
+          }
+        );
+
+        if (!contentResponse.ok) {
+          throw new Error(
+            "Ebook tidak dapat dibuka. Silakan coba masuk kembali."
+          );
         }
 
-        // --- WORKSHEET ---
-        const QS=[
-         {id:'q1',c:'Kegagalan terbesar',t:'Ceritakan kegagalan terbesarmu.',nilai:'Kesadaran diri: apakah kamu bisa menyebut bagian yang menjadi tanggung jawabmu.',trap:'Memilih kegagalan palsu seperti "terlalu perfeksionis", atau menyalahkan orang lain.',
-          ph:['Dulu, saat saya mengerjakan... (kapan, apa, bersama siapa)','Bagian saya adalah... (keputusan yang kamu ambil)','Sejak itu saya... (tindakan nyata, frekuensi, atau hasil)','Dari sini saya belajar bahwa... (satu kalimat)'],
-          ex:{s:'Waktu mengerjakan skripsi, revisi Bab 4 saya ditolak dosen pembimbing sampai tiga kali.',k:'Saya baru konsultasi setelah draf hampir final, karena saya pikir harus rapi dulu. Akibatnya salah arah baru ketahuan di akhir.',b:'Setelah itu saya bawa draf kasar tiap dua minggu. Bab 5 dan 6 selesai lebih cepat dan revisinya tinggal sekali.',i:'Minta masukan lebih awal bukan tanda saya belum mampu, tapi cara menghemat waktu.',note:'Ada keputusan spesifik yang diakui tanpa membela diri, dan perubahan yang bisa dicek.'},pr:{k:'Kalau bisa mengulang, keputusan pertama apa yang akan kamu ubah?'}},
-         {id:'q2',c:'Konflik dengan orang lain',t:'Ceritakan saat kamu berkonflik dengan orang lain.',nilai:'Cara kamu memperlakukan orang yang berbeda pendapat.',trap:'Menjadikan lawan konflik sebagai orang jahat, atau mengaku "tidak pernah berkonflik".',
-          ph:['Di tugas kelompok atau organisasi, saya dan ... berbeda pendapat tentang...','Bagian saya dalam konflik itu adalah...','Cara saya menanganinya: ... Hasilnya...','Dari situ saya tahu bahwa...'],
-          ex:{s:'Di tugas kelompok semester 5, satu anggota tidak mengerjakan bagiannya dan saya diam dua minggu karena tidak enak.',k:'Itu kesalahan saya: harusnya bicara lebih awal.',b:'Saya ajak dia bicara berdua. Ternyata dia kewalahan karena kerja paruh waktu. Bagiannya kami bagi ulang, dan saya sepakati pembagian tugas tertulis di minggu pertama tiap kerja kelompok.',i:'Diam itu bukan menghindari konflik, hanya menundanya.',note:'Tidak ada pihak yang dijadikan penjahat. Ada pengakuan dan perubahan perilaku.'},pr:{k:'Apa yang kamu lakukan yang membuat konflik itu lebih besar?',b:'Bagaimana hubunganmu dengan orang itu setelahnya?'}},
-         {id:'q3',c:'Kelemahanmu',t:'Apa kelemahanmu?',nilai:'Kejujuran dan kemampuan mengelola diri.',trap:'Kelemahan yang sebenarnya kelebihan ("terlalu pekerja keras"), atau kelemahan fatal tanpa cara mengelolanya.',
-          ph:['Saya cenderung... Ini terlihat saat...','Dampaknya: ... (tanpa menyalahkan orang lain)','Sekarang saya mengelolanya dengan... Hasilnya...','Kelemahan ini mengajarkan saya... (opsional)'],
-          ex:{s:'Saya cenderung sulit menolak permintaan teman, sampai di semester 6 saya memegang tiga tugas kelompok sekaligus.',k:'Saya tidak berani menolak dan itu kesalahan saya: dua tugas akhirnya terlambat.',b:'Sekarang sebelum menyanggupi, saya cek jadwal dulu dan menawarkan bagian yang bisa saya kerjakan. Hasilnya, di semester 7 tidak ada tugas yang terlambat.',i:'Menolak sebagian justru membuat saya lebih bisa diandalkan.',note:'Kelemahan nyata, dampaknya diakui, dan ada cara mengelola yang terbukti.'},pr:{b:'Kapan terakhir kelemahan itu muncul, dan apa yang kamu lakukan?'}},
-         {id:'q4',c:'Kerja di bawah tekanan',t:'Ceritakan saat kamu bekerja di bawah tekanan.',nilai:'Stabilitas: apa yang kamu lakukan saat panik, bukan seolah tidak pernah panik.',trap:'Mengaku selalu tenang, atau menceritakan tekanan tanpa langkah nyata.',
-          ph:['Saat itu tenggat atau masalahnya adalah... (kapan, apa yang dipertaruhkan)','Reaksi pertama saya adalah... (jujur, termasuk yang kurang tepat)','Lalu saya... (langkah konkret dan hasilnya)','Di bawah tekanan saya belajar...'],
-          ex:{s:'Seminggu sebelum seminar proposal skripsi, laptop saya rusak dan slide baru selesai 5 dari 25 halaman.',k:'Saya terlalu lama panik dan tidak langsung memberi tahu pembimbing; seharusnya itu langkah pertama.',b:'Saya pinjam laptop teman, memangkas slide dari 25 menjadi 12, dan melapor ke pembimbing hari itu juga. Seminar selesai sesuai jadwal.',i:'Di bawah tekanan, memberi kabar lebih awal lebih menolong daripada menyelesaikan sendirian.',note:'Panik diakui, bukan disembunyikan. Langkah konkret dan hasilnya jelas.'},pr:{k:'Apa reaksi pertamamu yang kurang tepat?'}},
-         {id:'q5',c:'Belum ada pengalaman',t:'Kamu belum punya pengalaman kerja. Kenapa kami harus percaya kamu bisa?',nilai:'Apakah kamu jujur soal keterbatasan dan bisa menunjukkan bukti belajar.',trap:'Janji "cepat belajar" tanpa contoh, atau membalik dengan bertanya soal pelatihan sebelum menjawab.',
-          ph:['Saya belum punya pengalaman kerja penuh waktu. Yang saya punya: ...','Keterbatasan saya adalah... Saya tidak akan mengaku... tanpa bukti','Buktinya: saat ... saya ... hasilnya...','Yang bisa saya tawarkan: ...'],
-          ex:{s:'Saya belum punya pengalaman kerja penuh waktu. Pengalaman terdekat saya magang tiga bulan dan tugas akhir.',k:'Jujur, itu keterbatasan saya, dan saya tidak akan mengaku cepat belajar tanpa bukti.',b:'Di magang, saya belajar membuat laporan mingguan dari nol dalam dua minggu, dan hasilnya dipakai atasan untuk rapat tim.',i:'Saya tidak menjanjikan langsung sempurna, tapi saya bisa jelaskan cara saya belajar.',note:'Keterbatasan diakui lebih dulu, lalu satu bukti belajar yang spesifik.'},pr:{b:'Ceritakan satu hal yang kamu pelajari sendiri, langkah demi langkah.'}}];
-        const F=['s','k','b','i'],FID={s:'ws_situasi',k:'ws_kendali',b:'ws_berubah',i:'ws_insight'},FK={ws_situasi:'s',ws_kendali:'k',ws_berubah:'b',ws_insight:'i'},LB={s:'Situasi',k:'Pengakuan',b:'Bukti',i:'Insight'};
-        const wsInputs=document.querySelectorAll('#view-7 .form-input, #view-7 .form-textarea');
-        let cq='q1',savedT;
-        const key=(q,f)=>'ksa_ws_'+q+'_'+f;
-        function curQ(){ return QS.find(x=>x.id===cq); }
-        function flashSaved(m){ const e=document.getElementById('saved-ind'); e.textContent=m||'✓ Tersimpan di perangkat ini'; clearTimeout(savedT); savedT=setTimeout(()=>e.textContent='',1800); }
-        function renderChips(){ document.getElementById('q-chips').innerHTML=QS.concat([{id:'c',c:'✏️ Tulis sendiri'}]).map(x=>`<button type="button" class="q-chip${x.id===cq?' active':''}" onclick="selectQ('${x.id}')">${F.some(f=>store.get(key(x.id,f)))?'✓ ':''}${x.c}</button>`).join(''); }
-        function renderGuide(){
-            const q=curQ(), g=document.getElementById('q-guide');
-            if(!q){ g.innerHTML='<p>Struktur empat bagian ini paling cocok untuk pertanyaan tentang pengalaman nyata. Isi dengan kejadian yang benar-benar kamu alami.</p>'; return; }
-            g.innerHTML=`<p><strong>Yang dinilai:</strong> ${q.nilai}</p><p><strong>Jebakan umum:</strong> ${q.trap}</p><button type="button" class="btn-action btn-secondary" onclick="toggleEx()">👀 Lihat contoh jawaban kuat</button><div id="q-ex" style="display:none;margin-top:12px"><div class="bubble me">`+F.map(f=>`<div class="script-sec"><small>${LB[f]}</small>${q.ex[f]}</div>`).join('')+`</div><div class="assessor-note visible">💭 Catatan Assessor: ${q.ex.note} Jangan dihafal; ini hanya gambaran, ceritamu harus milikmu.</div></div>`;
-        }
-        function toggleEx(){ const e=document.getElementById('q-ex'); e.style.display=e.style.display==='none'?'block':'none'; }
-        function selectQ(id){
-            cq=id; store.set('ksa_cq',id); resetClearBtn(); renderChips(); renderGuide();
-            document.getElementById('custom-q-group').style.display=id==='c'?'block':'none';
-            document.getElementById('ws_pertanyaan').value=id==='c'?(store.get('ksa_ws_c_q')||''):'';
-            const q=curQ(), dflt=['Dulu, saat saya...','Bagian yang menjadi tanggung jawab saya adalah...','Sejak itu saya...','Dari sini saya belajar bahwa...'];
-            F.forEach((f,i)=>{ const el=document.getElementById(FID[f]); el.value=store.get(key(id,f))||''; el.placeholder=q?q.ph[i]:dflt[i]; });
-            document.getElementById('preview-card').style.display='none';
-        }
-        function initWS(){
-            wsInputs.forEach(i=>i.addEventListener('input',()=>{ if(i.id==='ws_pertanyaan') store.set('ksa_ws_c_q',i.value); else store.set(key(cq,FK[i.id]),i.value); flashSaved(); renderChips(); }));
-            const s=store.get('ksa_cq'); selectQ((s==='c'||QS.some(x=>x.id===s))?s:'q1');
-        }
-        function esc(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-        function generatePreview(){
-            const g=id=>document.getElementById(id).value.trim();
-            const q=cq==='c'?g('ws_pertanyaan'):curQ().t;
-            const body=[g('ws_situasi'),g('ws_kendali'),g('ws_berubah'),g('ws_insight')].filter(Boolean).map(s=>/[.!?]$/.test(s)?s:s+'.').join(' ');
-            let h=''; if(q) h+=`<strong>HR:</strong> "${esc(q)}"<br><br>`; if(body) h+=`<strong>Aku:</strong> "${esc(body)}"`;
-            document.getElementById('preview-text').innerHTML=h||'<em>Isi formulir di atas terlebih dahulu...</em>';
-            const c=document.getElementById('preview-card'); c.style.display='block'; c.scrollIntoView({behavior:'smooth',block:'center'});
-        }
-        let clearArm=false,clearT;
-        function resetClearBtn(){ clearArm=false; document.getElementById('btn-clear').textContent='Hapus Pertanyaan Ini'; }
-        function clearForm(){
-            if(!clearArm){ clearArm=true; document.getElementById('btn-clear').textContent='Yakin? Ketuk sekali lagi untuk menghapus'; clearT=setTimeout(resetClearBtn,4000); return; }
-            clearTimeout(clearT);
-            F.forEach(f=>store.del(key(cq,f))); if(cq==='c') store.del('ksa_ws_c_q');
-            document.getElementById('preview-text').innerHTML='';
-            selectQ(cq); flashSaved('✓ Pertanyaan ini dikosongkan');
-            document.getElementById('q-chips').scrollIntoView({behavior:'smooth',block:'center'});
+        const html = await contentResponse.text();
+
+        if (!html.toLowerCase().includes("<html")) {
+          throw new Error("Konten ebook tidak memiliki format HTML yang benar.");
         }
 
-        // --- CETAK / PDF ---
-        const LBL={s:'Situasi Spesifik',k:'Apa yang dalam Kendalimu (Pengakuan)',b:'Apa yang Berubah (Bukti)',i:'Insight Singkat (opsional)'};
-        function openPrint(){ document.getElementById('print-modal').classList.add('active'); }
-        function closePrint(e){ if(!e||e.target.id==='print-modal'||e.target.classList.contains('close-btn')) document.getElementById('print-modal').classList.remove('active'); }
-        function buildPrint(mode){
-            document.querySelectorAll('.print-extra').forEach(e=>e.remove());
-            const h=(mode==='book'?3:5)*8;
-            let sh='<div class="print-only print-extra"><h2>Latihan Singkat: 3 Pertanyaan Follow-up</h2><p>Versi cetak: pilih jawabanmu dulu, baru baca Catatan Assessor di bawahnya.</p>';
-            SIM.forEach((s,i)=>{ sh+=`<div class="pq"><p><strong>Soal ${i+1}.</strong> ${s.q}</p>`+s.o.map((o,j)=>`<p>${'ABC'[j]}. ${o[0]}</p>`).join('')+'<p class="pn"><strong>Catatan Assessor:</strong></p>'+s.o.map((o,j)=>`<p class="pn">${'ABC'[j]}. ${o[2]}${o[1]?' ✓':''}</p>`).join('')+'</div>'; });
-            document.querySelector('#view-6 .simulator-box').insertAdjacentHTML('afterend',sh+'</div>');
-            const fields=(id,q)=>F.map((f,i)=>{ const v=(store.get(key(id,f))||'').trim(); return `<p><strong>${i+1}. ${LBL[f]}</strong>${q?`<span class="ph">${q.ph[i]}</span>`:''}</p>`+(v?`<div class="wl-filled">${esc(v)}</div>`:`<div class="wl" style="height:${h}mm"></div>`); }).join('');
-            let w='<div class="print-only print-extra"><h2>Lembar Latihan</h2><p>Pilih satu pertanyaan, isi keempat bagian dengan kejadian nyatamu. Jangan menghafal contoh; contoh ada di lampiran.</p>';
-            QS.forEach((q,n)=>{ w+=`<div class="pq ws-q"><h3>Pertanyaan ${n+1}: ${q.t}</h3><p><strong>Yang dinilai:</strong> ${q.nilai}</p><p><strong>Jebakan umum:</strong> ${q.trap}</p>`+fields(q.id,q)+'</div>'; });
-            w+='<div class="pq ws-q"><h3>Pertanyaanmu sendiri</h3><div class="wl" style="height:10mm"></div>'+fields('c',null)+'</div>';
-            w+='<h2>Lampiran: Contoh Jawaban Kuat (untuk dikenali, bukan dihafal)</h2>';
-            QS.forEach(q=>{ w+=`<div class="pq"><h3>${q.t}</h3>`+F.map(f=>`<p><strong>${LBL[f]}:</strong> ${q.ex[f]}</p>`).join('')+`<p class="pn">Catatan Assessor: ${q.ex.note}</p></div>`; });
-            document.querySelector('#view-7 .worksheet-section').insertAdjacentHTML('afterend',w+'</div>');
-        }
-        function printDoc(mode){
-            closePrint(); buildPrint(mode);
-            const old=document.getElementById('pg-style'); if(old) old.remove();
-            const st=document.createElement('style'); st.id='pg-style';
-            st.textContent=mode==='book'?'@page{size:176mm 250mm;margin:16mm 15mm}':'@page{size:A4;margin:12mm}';
-            document.head.appendChild(st); document.body.classList.remove('print-book','print-work'); document.body.classList.add('print-'+mode);
-            const done=()=>{ document.body.classList.remove('print-book','print-work'); st.remove(); document.querySelectorAll('.print-extra').forEach(e=>e.remove()); window.removeEventListener('afterprint',done); };
-            window.addEventListener('afterprint',done);
-            setTimeout(()=>window.print(),150);
-        }
-        (function(){ const c=document.querySelector('.container'); ORDER.forEach(id=>c.appendChild(document.getElementById('view-'+id))); })();
+        // Jangan simpan token di URL atau localStorage.
+        // Tampilkan konten yang sudah diterima dari endpoint terproteksi.
+        const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+        const ebookUrl = URL.createObjectURL(blob);
 
-        // --- INIT ---
-        document.querySelectorAll('.t1-link').forEach(a=>{a.href=T1_URL;a.target='_blank';a.rel='noopener';});
-        renderSim(); initWS();
-        const sp=parseInt(store.get('ksa_pos'),10);
-        showView(ORDER[(sp>0&&sp<ORDER.length)?sp:0]);
-    </script>
+        message.textContent = "Ebook berhasil dibuka.";
+        window.location.assign(ebookUrl);
+
+      } catch (error) {
+        message.textContent =
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan. Silakan coba lagi.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
