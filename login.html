@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Akses Ebook</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #202938;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 32px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.08);
+    }
+
+    h1 { margin-top: 0; font-size: 26px; }
+    p { line-height: 1.6; color: #596579; }
+
+    label {
+      display: block;
+      margin: 22px 0 8px;
+      font-weight: bold;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    input {
+      border: 1px solid #cbd2df;
+      margin-bottom: 14px;
+    }
+
+    button {
+      border: 0;
+      background: #2347d5;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    #message {
+      margin-top: 16px;
+      overflow-wrap: anywhere;
+    }
+
+    .hint { font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Akses Ebook</h1>
+    <p>Masukkan kode akses yang kamu terima setelah pembelian.</p>
+
+    <form id="login-form">
+      <label for="code">Kode akses</label>
+      <input
+        id="code"
+        name="code"
+        type="text"
+        placeholder="Contoh: EBK-..."
+        autocomplete="off"
+        required
+        maxlength="100"
+      >
+      <button id="submit-button" type="submit">
+        Buka Ebook
+      </button>
+    </form>
+
+    <p id="message" role="status" aria-live="polite"></p>
+    <p class="hint">Jangan bagikan kode aksesmu kepada orang lain.</p>
+  </main>
+
+  <script>
+    // Ganti kedua nilai ini dengan informasi proyek Supabase kamu.
+    const SUPABASE_URL = "https://ffyruatfbeuleycaokbj.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_Z1GQBWvh-x2JlxiLTfjJdQ_M8gv4jLM";
+
+    const form = document.getElementById("login-form");
+    const codeInput = document.getElementById("code");
+    const button = document.getElementById("submit-button");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const code = codeInput.value.trim();
+      if (!code) return;
+
+      button.disabled = true;
+      message.textContent = "Memeriksa kode akses...";
+
+      try {
+        const verifyResponse = await fetch(
+          `${SUPABASE_URL}/functions/v1/verify-ebook-code`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": SUPABASE_ANON_KEY,
+              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({ code })
+          }
+        );
+
+        const result = await verifyResponse.json();
+
+        if (!verifyResponse.ok || result.valid !== true ||
+            typeof result.session_token !== "string") {
+          throw new Error(
+            result.message || result.error || "Kode tidak valid."
+          );
+        }
+
+        message.textContent = "Kode benar. Mengambil ebook...";
+
+        const contentResponse = await fetch(
+          `${SUPABASE_URL}/functions/v1/get-ebook-content`,
+          {
+            method: "GET",
+            headers: {
+              "apikey": SUPABASE_ANON_KEY,
+              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+              "x-ebook-session": result.session_token
+            },
+            cache: "no-store"
+          }
+        );
+
+        if (!contentResponse.ok) {
+          throw new Error(
+            "Ebook tidak dapat dibuka. Silakan coba masuk kembali."
+          );
+        }
+
+        const html = await contentResponse.text();
+
+        if (!html.toLowerCase().includes("<html")) {
+          throw new Error("Konten ebook tidak memiliki format HTML yang benar.");
+        }
+
+        // Jangan simpan token di URL atau localStorage.
+        // Tampilkan konten yang sudah diterima dari endpoint terproteksi.
+        const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+        const ebookUrl = URL.createObjectURL(blob);
+
+        message.textContent = "Ebook berhasil dibuka.";
+        window.location.assign(ebookUrl);
+
+      } catch (error) {
+        message.textContent =
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan. Silakan coba lagi.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
